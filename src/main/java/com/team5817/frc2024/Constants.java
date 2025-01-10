@@ -10,6 +10,7 @@ import com.team5817.frc2024.subsystems.vision.VisionDeviceConstants;
 import com.team5817.lib.swerve.SwerveModule.SwerveModuleConstants;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
+import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.swerve.SwerveDriveKinematics;
 import com.team254.lib.swerve.SwerveKinematicLimits;
 
@@ -23,6 +24,12 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
+
+	public enum Mode{
+		SIM,
+		REPLAY
+	}
+	public static Mode mode = Mode.SIM;
 
 	// Disables extra smart dashboard outputs that slow down the robot
 	public static final boolean disableExtraTelemetry = false;
@@ -122,7 +129,7 @@ public class Constants {
 			kSwerveKinematicLimits.kMaxDriveAcceleration = Double.MAX_VALUE;
 			kSwerveKinematicLimits.kMaxSteeringVelocity = maxAngularVelocity;
 		}
-
+		
 		public static final SwerveKinematicLimits kSwerveUncappedKinematicLimits = new SwerveKinematicLimits();
 
 		static {

@@ -3,6 +3,7 @@ package com.team254.lib.geometry;
 import com.team254.lib.util.Util;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.util.struct.StructSerializable;
 
 import java.text.DecimalFormat;
 
@@ -15,7 +16,7 @@ import static edu.wpi.first.units.Units.Radian;
  * <p>
  * Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
  */
-public class Rotation2d implements IRotation2d<Rotation2d> {
+public class Rotation2d implements IRotation2d<Rotation2d>, StructSerializable {
     public static final Rotation2d kIdentity = new Rotation2d();
     public static final Rotation2d kPi = new Rotation2d(Math.PI, false);
     public static final Rotation2d kHalfPi = new Rotation2d(Math.PI / 2.0, false);
@@ -310,4 +311,5 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
     public Rotation2d getRotation() {
         return this;
     }
+    public static final Rotation2dStruct struct = new Rotation2dStruct();
 }

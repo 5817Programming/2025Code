@@ -27,9 +27,24 @@ import com.team254.lib.swerve.SwerveModuleState;
 import com.team254.lib.swerve.SwerveSetpoint;
 import com.team254.lib.swerve.SwerveSetpointGenerator;
 import com.team254.lib.trajectory.timing.TimedState;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
+
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilogram;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Pound;
+import static edu.wpi.first.units.Units.Volt;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.littletonrobotics.junction.Logger;
 
 public class Drive extends Subsystem {
 
@@ -37,16 +52,16 @@ public class Drive extends Subsystem {
 		FORCE_ORIENT,
 		OPEN_LOOP,
 		HEADING_CONTROL,
-		VELOCITY,
-		PATH_FOLLOWING
+		// VELOCITY,
+		// PATH_FOLLOWING
 	}
 
 	private WheelTracker mWheelTracker;
 	private Pigeon mPigeon = Pigeon.getInstance();
 	public SwerveModule[] mModules;
 
-	private PeriodicIO mPeriodicIO = new PeriodicIO();
-	private DriveControlState mControlState = DriveControlState.FORCE_ORIENT;
+	private SwerveInputs mPeriodicIO = new SwerveInputs();
+	private DriveControlState mControlState = DriveControlState.OPEN_LOOP;
 
 	private SwerveSetpointGenerator mSetpointGenerator;
 
@@ -72,7 +87,25 @@ public class Drive extends Subsystem {
 		}
 		return mInstance;
 	}
-
+	    public static final DriveTrainSimulationConfig mapleSimConfig = DriveTrainSimulationConfig.Default()
+            .withRobotMass(Pound.of(115))
+            .withTrackLengthTrackWidth(Inches.of(29), Inches.of(29))
+            .withGyro(COTS.ofPigeon2())
+            .withSwerveModule(new SwerveModuleSimulationConfig(
+                    DCMotor.getKrakenX60(1),
+                    DCMotor.getFalcon500(1),
+                    SwerveConstants.driveGearRatio,
+                    SwerveConstants.angleGearRatio,
+                    Volt.of(.2),
+                    Volt.of(.2),
+                    Inches.of(2),
+                    KilogramSquareMeters.of(.005),
+                    1.2));
+		
+		public static SwerveDriveSimulation driveSimulation;
+		public static void registerDriveSimulation(SwerveDriveSimulation sim) {
+			driveSimulation = sim;
+		}
 	private Drive() {
 		mModules = new SwerveModule[] {
 			new SwerveModule(
@@ -103,14 +136,14 @@ public class Drive extends Subsystem {
 	 * @param speeds ChassisSpeeds object derived from joystick input.
 	 */
 	public void feedTeleopSetpoint(ChassisSpeeds speeds) {
-		if (mControlState == DriveControlState.PATH_FOLLOWING) {
-			if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
-					> mKinematicLimits.kMaxDriveVelocity * 0.1) {
-				mControlState = DriveControlState.OPEN_LOOP;
-			} else {
-				return;
-			}
-		} else if (mControlState == DriveControlState.HEADING_CONTROL) {
+		// if (mControlState == DriveControlState.PATH_FOLLOWING) {
+		// 	if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
+		// 			> mKinematicLimits.kMaxDriveVelocity * 0.1) {
+		// 		mControlState = DriveControlState.OPEN_LOOP;
+		// 	} else {
+		// 		return;
+		// 	}
+		if (mControlState == DriveControlState.HEADING_CONTROL) {
 			if (Math.abs(speeds.omegaRadiansPerSecond) > 1.0) {
 				mControlState = DriveControlState.OPEN_LOOP;
 			} else {
@@ -133,12 +166,12 @@ public class Drive extends Subsystem {
 			mControlState = DriveControlState.OPEN_LOOP;
 		}
 	}
-	public void setVelocity(ChassisSpeeds speeds) {
-		mPeriodicIO.des_chassis_speeds = speeds;
-		if (mControlState != DriveControlState.VELOCITY) {
-			mControlState = DriveControlState.VELOCITY;
-		}
-	}
+	// public void setVelocity(ChassisSpeeds speeds) {
+	// 	mPeriodicIO.des_chassis_speeds = speeds;
+	// 	if (mControlState != DriveControlState.VELOCITY) {
+	// 		mControlState = DriveControlState.VELOCITY;
+	// 	}
+	// }
 
 	/**
 	 * Instructs the drivetrain to snap heading to target angle.
@@ -146,7 +179,7 @@ public class Drive extends Subsystem {
 	 * @param angle Rotation2d angle to snap to.
 	 */
 	public void snapHeading(Rotation2d angle) {
-		if (mControlState != DriveControlState.HEADING_CONTROL && mControlState != DriveControlState.PATH_FOLLOWING) {
+		if (mControlState != DriveControlState.HEADING_CONTROL){ //&& mControlState != DriveControlState.PATH_FOLLOWING) {
 			mControlState = DriveControlState.HEADING_CONTROL;
 		}
 		mHeadingController.setTargetSnapHeading(angle);
@@ -158,7 +191,7 @@ public class Drive extends Subsystem {
 	 * @param angle Target angle to stabilize around.
 	 */
 	public void stabilizeHeading(Rotation2d angle) {
-		if (mControlState != DriveControlState.HEADING_CONTROL && mControlState != DriveControlState.PATH_FOLLOWING) {
+		if (mControlState != DriveControlState.HEADING_CONTROL){// && mControlState != DriveControlState.PATH_FOLLOWING) {
 			mControlState = DriveControlState.HEADING_CONTROL;
 		}
 		mHeadingController.setTargetStabilizeHeading(angle);
@@ -221,13 +254,13 @@ public class Drive extends Subsystem {
 			public void onLoop(double timestamp) {
 				synchronized (Drive.this) {
 					switch (mControlState) {
-						case PATH_FOLLOWING:
+						// case PATH_FOLLOWING:
 							// updatePathFollower();
-							break;
+							// break;
 						case HEADING_CONTROL:
 							break;
 						case OPEN_LOOP:
-						case VELOCITY:
+						// case VELOCITY:
 						case FORCE_ORIENT:
 							break;
 						default:
@@ -242,7 +275,9 @@ public class Drive extends Subsystem {
 									mWheelTracker.getRobotPose(),
 									mPeriodicIO.measured_velocity,
 									mPeriodicIO.predicted_velocity);
+					mWheelTracker.readPeriodicInputs();
 				}
+
 			}
 
 			@Override
@@ -263,6 +298,7 @@ public class Drive extends Subsystem {
 
 		mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 		mPeriodicIO.heading = mPigeon.getYaw();
+		Logger.recordOutput("heading", mPeriodicIO.heading);
 		mPeriodicIO.pitch = mPigeon.getPitch();
 
 		Twist2d twist_vel = Constants.SwerveConstants.kKinematics
@@ -310,6 +346,7 @@ public class Drive extends Subsystem {
 				mPeriodicIO.des_chassis_speeds.vyMetersPerSecond * Constants.kLooperDt * 4.0,
 				Rotation2d.fromRadians(
 						mPeriodicIO.des_chassis_speeds.omegaRadiansPerSecond * Constants.kLooperDt * 4.0));
+
 		Twist2d twist_vel = Pose2d.log(robot_pose_vel).scaled(1.0 / (4.0 * Constants.kLooperDt));
 
 		ChassisSpeeds wanted_speeds;
@@ -322,12 +359,11 @@ public class Drive extends Subsystem {
 			wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
 		}
 
-		mPeriodicIO.setpoint = mSetpointGenerator.generateSetpoint(mKinematicLimits, mPeriodicIO.setpoint, wanted_speeds, Constants.kLooperDt);
 
+		mPeriodicIO.setpoint = mSetpointGenerator.generateSetpoint(mKinematicLimits, mPeriodicIO.setpoint, wanted_speeds, Constants.kLooperDt);
 		mPeriodicIO.predicted_velocity =
 				Pose2d.log(Pose2d.exp(wanted_speeds.toTwist2d()).rotateBy(getHeading()));
 
-		
 		mPeriodicIO.des_module_states = mPeriodicIO.setpoint.mModuleStates;
 	}
 
@@ -361,11 +397,11 @@ public class Drive extends Subsystem {
 		for (int i = 0; i < mModules.length; i++) {
 			if (mControlState == DriveControlState.OPEN_LOOP || mControlState == DriveControlState.HEADING_CONTROL) {
 				mModules[i].setOpenLoop(mPeriodicIO.des_module_states[i]);
-			} else if (mControlState == DriveControlState.PATH_FOLLOWING
-					|| mControlState == DriveControlState.VELOCITY
-					|| mControlState == DriveControlState.FORCE_ORIENT) {
-				mModules[i].setVelocity(mPeriodicIO.des_module_states[i]);
-			}
+			} //else if (mControlState == DriveControlState.PATH_FOLLOWING
+					// || mControlState == DriveControlState.VELOCITY
+					//|| mControlState == DriveControlState.FORCE_ORIENT) {
+				// mModules[i].setVelocity(mPeriodicIO.des_module_states[i]);
+			//}
 		}
 
 		for (SwerveModule swerveModule : mModules) {
@@ -419,7 +455,6 @@ public class Drive extends Subsystem {
 	public Rotation2d getHeading() {
 		return mPigeon.getYaw();
 	}
-
 	public DriveMotionPlanner getMotionPlanner() {
 		return mMotionPlanner;
 	}
@@ -427,19 +462,23 @@ public class Drive extends Subsystem {
 	public SwerveKinematicLimits getKinematicLimits() {
 		return mKinematicLimits;
 	}
-
-	public static class PeriodicIO {
+	
+	public static class SwerveInputs {
 		// Inputs/Desired States
 		double timestamp;
 		ChassisSpeeds des_chassis_speeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 		Twist2d measured_velocity = Twist2d.identity();
-		Rotation2d heading = new Rotation2d();
-		Rotation2d pitch = new Rotation2d();
-		SwerveSetpoint setpoint = new SwerveSetpoint(new ChassisSpeeds(), new SwerveModuleState[SwerveConstants.kKinematics.getNumModules()]); 
+
+		SwerveSetpoint setpoint = new SwerveSetpoint(new ChassisSpeeds(), new SwerveModuleState[] {
+			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()
+		}); 
+		Rotation2d heading = Rotation2d.identity();
+		Rotation2d pitch = Rotation2d.identity();
 		// Outputs
 		SwerveModuleState[] des_module_states = new SwerveModuleState[] {
 			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()
 		};
+		
 		Twist2d predicted_velocity = Twist2d.identity();
 		Translation2d translational_error = Translation2d.identity();
 		Rotation2d heading_error = Rotation2d.identity();
@@ -449,6 +488,9 @@ public class Drive extends Subsystem {
 
 	@Override
 	public void outputTelemetry() {
+		for (SwerveModule module : mModules) {
+			module.outputTelemetry();
+		}
 	}
 
 	public DriveControlState getControlState() {

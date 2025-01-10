@@ -2,12 +2,14 @@ package com.team254.lib.geometry;
 
 import com.team254.lib.util.Util;
 
+import edu.wpi.first.util.struct.StructSerializable;
+
 import java.text.DecimalFormat;
 
 /**
  * A translation in a 2d coordinate frame. Translations are simply shifts in an (x, y) plane.
  */
-public class Translation2d implements ITranslation2d<Translation2d> {
+public class Translation2d implements ITranslation2d<Translation2d>,StructSerializable {
     protected static final Translation2d kIdentity = new Translation2d();
 
     public static Translation2d identity() {
@@ -66,6 +68,9 @@ public class Translation2d implements ITranslation2d<Translation2d> {
 
     public double y() {
         return y_;
+    }
+    public edu.wpi.first.math.geometry.Translation2d wpi(){
+        return new edu.wpi.first.math.geometry.Translation2d(x_, y_);
     }
 
     /**
@@ -199,4 +204,5 @@ public class Translation2d implements ITranslation2d<Translation2d> {
     public Translation2d getTranslation() {
         return this;
     }
+    public static final Translation2dStruct struct = new Translation2dStruct();
 }

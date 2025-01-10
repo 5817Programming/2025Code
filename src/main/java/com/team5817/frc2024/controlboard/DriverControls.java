@@ -9,8 +9,11 @@ public class DriverControls {
 	ControlBoard mControlBoard = ControlBoard.getInstance();
 
 	Superstructure mSuperstructure = Superstructure.getInstance();
-	Drive mDrive = Drive.getInstance();
+	Drive mDrive;
 	LEDs mLEDs = LEDs.getInstance();
+	public DriverControls(){
+		mDrive = Drive.getInstance();
+	}
 
 	/* ONE CONTROLLER */
 

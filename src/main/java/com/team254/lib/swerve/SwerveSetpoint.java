@@ -1,6 +1,8 @@
 package com.team254.lib.swerve;
 
-public class SwerveSetpoint {
+import edu.wpi.first.util.struct.StructSerializable;
+
+public class SwerveSetpoint implements StructSerializable {
     public ChassisSpeeds mChassisSpeeds;
     public SwerveModuleState[] mModuleStates;
 
@@ -17,4 +19,5 @@ public class SwerveSetpoint {
         }
         return ret;
     }
+    public static final SwerveSetpointStruct struct = new SwerveSetpointStruct();
 }

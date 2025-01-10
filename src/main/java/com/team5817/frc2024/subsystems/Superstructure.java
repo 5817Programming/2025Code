@@ -36,11 +36,13 @@ public class Superstructure extends Subsystem {
 
 
 	// Target tracking
-	private Drive mDrive = Drive.getInstance();
+	private Drive mDrive;
 	private double mDistanceToTarget = 0.0;
 	private double mAngularErrToTarget = 0.0;
 
-
+	Superstructure() {
+		mDrive = Drive.getInstance();
+	}
 	public boolean requestsCompleted() {
 		return allRequestsComplete;
 	}

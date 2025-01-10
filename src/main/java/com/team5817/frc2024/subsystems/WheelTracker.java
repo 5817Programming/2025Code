@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WheelTracker {
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
+
+public class WheelTracker extends Subsystem{
 	private final Pigeon mPigeon = Pigeon.getInstance();
 	private final SwerveModule[] mModules;
 
@@ -28,6 +31,7 @@ public class WheelTracker {
 	private BaseStatusSignal[] mAllSignals;
 
 	private OdometryThread mOdometryThread;
+	private WheelTrackerInputsAutoLogged inputs = new WheelTrackerInputsAutoLogged();
 
 	public WheelTracker(SwerveModule[] modules) {
 		if (modules.length != 4) {
@@ -73,6 +77,11 @@ public class WheelTracker {
 	public void stop() {
 		mIsEnabled = false;
 	}
+	@Override
+	public void readPeriodicInputs(){
+		Logger.processInputs("WheelTracker", inputs);
+	}
+
 
 	private class OdometryThread extends Thread {
 		@Override
@@ -92,6 +101,7 @@ public class WheelTracker {
 				}
 			}
 		}
+		
 	}
 
 	private Pose2d last_velocity_sample = new Pose2d();
@@ -156,8 +166,13 @@ public class WheelTracker {
 			last_velocity_sample = new_pose;
 		}
 
-		robotPose = new_pose;
-		resetModulePoses(robotPose);
+		inputs.pose = new_pose;
+		resetModulePoses(inputs.pose);
+	}
+	@AutoLog
+	public static class WheelTrackerInputs{
+		Pose2d pose= new Pose2d();
+		Translation2d velocity= new Translation2d();
 	}
 
 	private void updateWheelOdometry(SwerveModule module, WheelProperties props) {

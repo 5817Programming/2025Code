@@ -6,11 +6,13 @@ package com.team254.lib.swerve;
 
 import com.team254.lib.geometry.Rotation2d;
 
+import edu.wpi.first.util.struct.StructSerializable;
+
 import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 @SuppressWarnings("MemberName")
-public class SwerveModuleState implements Comparable<SwerveModuleState> {
+public class SwerveModuleState implements Comparable<SwerveModuleState>,StructSerializable {
     /** Speed of the wheel of the module. */
     public double speedMetersPerSecond;
 

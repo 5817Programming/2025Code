@@ -2,6 +2,8 @@ package com.team254.lib.geometry;
 
 import com.team254.lib.util.Util;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import java.text.DecimalFormat;
 import java.util.Optional;
 

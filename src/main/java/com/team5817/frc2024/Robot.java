@@ -4,12 +4,20 @@
 
 package com.team5817.frc2024;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.swerve.ChassisSpeeds;
+import com.team5817.BuildConstants;
 import com.team5817.frc2024.controlboard.ControlBoard;
 import com.team5817.frc2024.controlboard.DriverControls;
 import com.team5817.frc2024.loops.Looper;
@@ -17,22 +25,25 @@ import com.team5817.frc2024.subsystems.Drive;
 import com.team5817.frc2024.subsystems.Superstructure;
 import com.team5817.frc2024.subsystems.vision.VisionDeviceManager;
 import com.team5817.lib.Util;
+import com.team5817.lib.drivers.Pigeon;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 public class Robot extends LoggedRobot {
 
     SubsystemManager mSubsystemManager;
-    Superstructure s = Superstructure.getInstance();
-    Drive drive = Drive.getInstance();
+    Superstructure s;
     VisionDeviceManager mVision = VisionDeviceManager.getInstance();
-    DriverControls controls = new DriverControls();
+    DriverControls controls;
     ControlBoard controlBoard = ControlBoard.getInstance();
     // public LoggedDashboardChooser<AutoBase> autoChooser = new LoggedDashboardChooser<>("AutoChooser");
     private final Looper mEnabledLooper = new Looper();
-  
+    SwerveDriveSimulation drivesim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d().wpi());
+    Drive drive;
   // HashMap<String,AutoBase> autos = new HashMap<String,AutoBase>();
     @Override
     public void robotInit() {
@@ -49,16 +60,41 @@ public class Robot extends LoggedRobot {
         // autoChooser.addOption(N, A);
       // }
   
+      Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+
+if (isReal()) {
+    Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+    Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+} else {
+    if(Constants.mode == Constants.Mode.REPLAY) {
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+      setUseTiming(false);
+    }else{
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-      Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+      new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging  
+    }
+}
+
+Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+          Drive.registerDriveSimulation(drivesim);
+          Pigeon.registerGyroSimulation(drivesim.getGyroSimulation());
+          SimulatedArena.getInstance().addDriveTrainSimulation(drivesim);
+      drive = Drive.getInstance();
       drive.resetModulesToAbsolute();
       mSubsystemManager = SubsystemManager.getInstance();
-  
+
+      controls = new DriverControls();
       mSubsystemManager.setSubsystems(
           Drive.getInstance(),
           Superstructure.getInstance(),
           VisionDeviceManager.getInstance()
           );
+          
           mSubsystemManager.registerEnabledLoops(mEnabledLooper);
           mEnabledLooper.start();
       }
@@ -79,7 +115,6 @@ boolean disableGyroReset = false;
     @Override
     public void autonomousInit() {
       disableGyroReset = true;
-      drive = Drive.getInstance();
       drive.resetModulesToAbsolute();
       // Superstructure.getInstance().setState(Superstructure.AUTO);
       // autoExecuter.setAuto(auto);
@@ -111,6 +146,8 @@ boolean disableGyroReset = false;
         controlBoard.getSwerveRotation(),
         Util.robotToFieldRelative(drive.getHeading(), DriverStation.getAlliance().get().equals(Alliance.Red))
       ));
+    
+      Logger.recordOutput("heading", drivesim.getGyroSimulation().getGyroReading());
     }
   
     /** This function is called once when the robot is disabled. */
@@ -139,6 +176,10 @@ boolean disableGyroReset = false;
     /** This function is called periodically during test mode. */
     @Override
     public void testPeriodic() {
+    }
+    @Override
+    public void simulationPeriodic() {
+        SimulatedArena.getInstance().simulationPeriodic();
     }
   }
  

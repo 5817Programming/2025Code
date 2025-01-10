@@ -1,5 +1,8 @@
 package com.team5817.frc2024.subsystems.vision;
 
+import com.team254.lib.geometry.Translation2d;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionDeviceConstants {

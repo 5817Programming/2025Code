@@ -3,6 +3,8 @@ package com.team254.lib.geometry;
 import com.team254.lib.util.Interpolable;
 import com.team254.lib.util.Util;
 
+import edu.wpi.first.util.struct.StructSerializable;
+
 import java.text.DecimalFormat;
 import java.util.Optional;
 
@@ -12,7 +14,7 @@ import java.util.Optional;
  * <p>
  * A Twist can be used to represent a difference between two poses, a velocity, an acceleration, etc.
  */
-public class Twist2d implements Interpolable<Twist2d>, ICourse2d<Twist2d> {
+public class Twist2d implements Interpolable<Twist2d>, ICourse2d<Twist2d>, StructSerializable {
     protected static final Twist2d kIdentity = new Twist2d(0.0, 0.0, 0.0);
 
     public static Twist2d identity() {
@@ -95,4 +97,5 @@ public class Twist2d implements Interpolable<Twist2d>, ICourse2d<Twist2d> {
                            Util.interpolate(dy, other.dy, x),
                            Util.interpolate(dtheta, other.dtheta, x));
     }
+    public static final Twist2dStruct struct = new Twist2dStruct();
 }

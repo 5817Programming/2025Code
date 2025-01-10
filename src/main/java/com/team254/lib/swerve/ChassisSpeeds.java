@@ -8,6 +8,8 @@ package com.team254.lib.swerve;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 
+import edu.wpi.first.util.struct.StructSerializable;
+
 /**
  * Represents the speed of a robot chassis. Although this struct contains similar members compared
  * to a Twist2d, they do NOT represent the same thing. Whereas a Twist2d represents a change in pose
@@ -19,7 +21,7 @@ import com.team254.lib.geometry.Twist2d;
  * will often have all three components.
  */
 @SuppressWarnings("MemberName")
-public class ChassisSpeeds {
+public class ChassisSpeeds implements StructSerializable{
     /** Represents forward velocity w.r.t the robot frame of reference. (Fwd is +) */
     public double vxMetersPerSecond;
 
@@ -89,5 +91,6 @@ public class ChassisSpeeds {
                 "ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)",
                 vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
     }
+    public static final ChassisSpeedsStruct struct = new ChassisSpeedsStruct();
 }
 
