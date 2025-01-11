@@ -78,6 +78,7 @@ public class Drive extends Subsystem {
 	private Rotation2d mTrackingAngle = Rotation2d.identity();
 
 	private SwerveKinematicLimits mKinematicLimits = SwerveConstants.kSwerveKinematicLimits;
+	private SwerveKinematicLimits mUncappedKinematicLimits = SwerveConstants.kSwerveUncappedKinematicLimits;
 
 	private static Drive mInstance;
 
@@ -149,6 +150,7 @@ public class Drive extends Subsystem {
 			} else {
 				double x = speeds.vxMetersPerSecond;
 				double y = speeds.vyMetersPerSecond;
+
 				double omega = mHeadingController.update(mPeriodicIO.heading, Timer.getFPGATimestamp());
 				mPeriodicIO.des_chassis_speeds = new ChassisSpeeds(x, y, omega);
 				return;
@@ -292,17 +294,20 @@ public class Drive extends Subsystem {
 
 	@Override
 	public void readPeriodicInputs() {
+
+		SwerveModuleState[] states;
+
+		if(Robot.isReal()
 		for (SwerveModule swerveModule : mModules) {
 			swerveModule.readPeriodicInputs();
 		}
+		mPeriodicIO.heading = mPigeon.getYaw();
+		mPeriodicIO.pitch = mPigeon.getPitch();
+		states = getModuleStates();
 
 		mPeriodicIO.timestamp = Timer.getFPGATimestamp();
-		mPeriodicIO.heading = mPigeon.getYaw();
-		Logger.recordOutput("heading", mPeriodicIO.heading);
-		mPeriodicIO.pitch = mPigeon.getPitch();
-
 		Twist2d twist_vel = Constants.SwerveConstants.kKinematics
-				.toChassisSpeeds(getModuleStates())
+				.toChassisSpeeds()
 				.toTwist2d();
 		Translation2d translation_vel = new Translation2d(twist_vel.dx, twist_vel.dy);
 		translation_vel = translation_vel.rotateBy(getHeading());
@@ -359,12 +364,14 @@ public class Drive extends Subsystem {
 			wanted_speeds = new ChassisSpeeds(twist_vel.dx, twist_vel.dy, twist_vel.dtheta);
 		}
 
-
 		mPeriodicIO.setpoint = mSetpointGenerator.generateSetpoint(mKinematicLimits, mPeriodicIO.setpoint, wanted_speeds, Constants.kLooperDt);
+		var uncapped_setpoint = mSetpointGenerator.generateSetpoint(mUncappedKinematicLimits, mPeriodicIO.setpoint, wanted_speeds, Constants.kLooperDt);
 		mPeriodicIO.predicted_velocity =
 				Pose2d.log(Pose2d.exp(wanted_speeds.toTwist2d()).rotateBy(getHeading()));
 
+		mPeriodicIO.uncapped_module_states = uncapped_setpoint.mModuleStates;
 		mPeriodicIO.des_module_states = mPeriodicIO.setpoint.mModuleStates;
+		
 	}
 
 	public void resetModulesToAbsolute() {
@@ -478,6 +485,9 @@ public class Drive extends Subsystem {
 		SwerveModuleState[] des_module_states = new SwerveModuleState[] {
 			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()
 		};
+		SwerveModuleState[] uncapped_module_states = new SwerveModuleState[] {
+			new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()
+		};
 		
 		Twist2d predicted_velocity = Twist2d.identity();
 		Translation2d translational_error = Translation2d.identity();
@@ -488,8 +498,25 @@ public class Drive extends Subsystem {
 
 	@Override
 	public void outputTelemetry() {
+		
+		Logger.recordOutput("Kinematic Limits accel", mKinematicLimits.kMaxDriveAcceleration);
+		Logger.recordOutput("Kinematic Limits vel", mKinematicLimits.kMaxDriveVelocity);
+		Logger.recordOutput("Kinematic Limits steer vel", mKinematicLimits.kMaxSteeringVelocity);
+		edu.wpi.first.math.kinematics.SwerveModuleState[] uncappedstates = new edu.wpi.first.math.kinematics.SwerveModuleState[4];
+		edu.wpi.first.math.kinematics.SwerveModuleState[] states = new edu.wpi.first.math.kinematics.SwerveModuleState[4];
+
+		for (SwerveModule mod : mModules) {
+			states[mod.moduleNumber()] = mod.getWpiState();
+			uncappedstates[mod.moduleNumber()] = new edu.wpi.first.math.kinematics.SwerveModuleState(
+				mPeriodicIO.uncapped_module_states[mod.moduleNumber()].speedMetersPerSecond, 
+				mPeriodicIO.uncapped_module_states[mod.moduleNumber()].angle.wpi());
+		}
+		Logger.recordOutput("Drive/States", states);
+		Logger.recordOutput("Drive/UncappedStates", uncappedstates);
+
 		for (SwerveModule module : mModules) {
 			module.outputTelemetry();
+
 		}
 	}
 
@@ -507,6 +534,6 @@ public class Drive extends Subsystem {
 	public boolean checkSystem() {
 		return false;
 	}
-
+// 
 
 }

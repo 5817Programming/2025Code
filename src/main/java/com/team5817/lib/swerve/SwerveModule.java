@@ -223,6 +223,8 @@ public class SwerveModule extends Subsystem {
 				mDriveMotor.getSupplyCurrent().getValueAsDouble());
 		Logger.recordOutput("Drive/Module" + kModuleNumber + "/Wheel Velocity Error",
 				Math.abs(getCurrentVelocity()) - Math.abs(mOutputs.driveVelocity));
+
+		Logger.recordOutput("Drive/Module" + kModuleNumber + "/Swerve Moduke State", new edu.wpi.first.math.kinematics.SwerveModuleState(mOutputs.driveVelocity, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(target_angle))); 
 		// spotless:on
 	}
 
@@ -244,6 +246,10 @@ public class SwerveModule extends Subsystem {
 
 	public SwerveModuleState getState() {
 		return new SwerveModuleState(getCurrentVelocity(), getModuleAngle());
+	}
+
+	public edu.wpi.first.math.kinematics.SwerveModuleState getWpiState() {
+		return new edu.wpi.first.math.kinematics.SwerveModuleState(mOutputs.driveVelocity, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(target_angle));
 	}
 
 	public SwerveModulePosition getPosition() {

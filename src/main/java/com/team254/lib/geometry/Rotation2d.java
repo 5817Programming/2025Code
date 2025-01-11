@@ -92,6 +92,10 @@ public class Rotation2d implements IRotation2d<Rotation2d>, StructSerializable {
         return fromRadians(angle.in(Radian));
     }
 
+    public edu.wpi.first.math.geometry.Rotation2d wpi() {
+        return new edu.wpi.first.math.geometry.Rotation2d(getRadians());
+    }
+
     public double cos() {
         ensureTrigComputed();
         return cos_angle_;

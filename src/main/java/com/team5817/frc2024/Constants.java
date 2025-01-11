@@ -41,7 +41,7 @@ public class Constants {
 	public static final double kJoystickThreshold = 0.2;
 	public static final int kButtonGamepadPort = 1;
 
-	public static final double stickDeadband = 0.15;
+	public static final double stickDeadband = 0.05;
 
 	// Timeout constants
 	public static final int kLongCANTimeoutMs = 100;
@@ -126,16 +126,16 @@ public class Constants {
 
 		static {
 			kSwerveKinematicLimits.kMaxDriveVelocity = maxSpeed;
-			kSwerveKinematicLimits.kMaxDriveAcceleration = Double.MAX_VALUE;
+			kSwerveKinematicLimits.kMaxDriveAcceleration = 20;
 			kSwerveKinematicLimits.kMaxSteeringVelocity = maxAngularVelocity;
 		}
 		
 		public static final SwerveKinematicLimits kSwerveUncappedKinematicLimits = new SwerveKinematicLimits();
 
 		static {
-			kSwerveKinematicLimits.kMaxDriveVelocity = maxSpeed;
-			kSwerveKinematicLimits.kMaxDriveAcceleration = Double.MAX_VALUE;
-			kSwerveKinematicLimits.kMaxSteeringVelocity = Double.MAX_VALUE;
+			kSwerveUncappedKinematicLimits.kMaxDriveVelocity = maxSpeed;
+			kSwerveUncappedKinematicLimits.kMaxDriveAcceleration = Double.MAX_VALUE;
+			kSwerveUncappedKinematicLimits.kMaxSteeringVelocity = Double.MAX_VALUE;
 		}
 	
 	

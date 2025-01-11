@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.swerve.ChassisSpeeds;
 import com.team5817.BuildConstants;
 import com.team5817.frc2024.controlboard.ControlBoard;
@@ -144,10 +145,10 @@ boolean disableGyroReset = false;
         controlBoard.getSwerveTranslation().x(),
         controlBoard.getSwerveTranslation().y(),
         controlBoard.getSwerveRotation(),
-        Util.robotToFieldRelative(drive.getHeading(), DriverStation.getAlliance().get().equals(Alliance.Red))
+        Rotation2d.kIdentity
+        // Util.robotToFieldRelative(drive.getHeading(), DriverStation.getAlliance().get().equals(Alliance.Red))
       ));
-    
-      Logger.recordOutput("heading", drivesim.getGyroSimulation().getGyroReading());
+
     }
   
     /** This function is called once when the robot is disabled. */
