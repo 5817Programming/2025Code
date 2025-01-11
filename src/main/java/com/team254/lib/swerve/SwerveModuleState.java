@@ -73,6 +73,9 @@ public class SwerveModuleState implements Comparable<SwerveModuleState>,StructSe
         return String.format(
                 "SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond, angle);
     }
+    public edu.wpi.first.math.kinematics.SwerveModuleState wpi(){
+        return new edu.wpi.first.math.kinematics.SwerveModuleState(speedMetersPerSecond,angle.wpi());
+    }
 
     /**
      * Minimize the change in heading the desired swerve module state would require by potentially

@@ -1,6 +1,7 @@
 package com.team5817.frc2024.subsystems;
 
 import com.team5817.frc2024.Constants;
+import com.team5817.frc2024.Robot;
 import com.team5817.frc2024.Constants.SwerveConstants;
 import com.team5817.frc2024.Constants.SwerveConstants.Mod0;
 import com.team5817.frc2024.Constants.SwerveConstants.Mod1;
@@ -294,20 +295,25 @@ public class Drive extends Subsystem {
 
 	@Override
 	public void readPeriodicInputs() {
-
-		SwerveModuleState[] states;
-
-		if(Robot.isReal()
+		SwerveModuleState[] module_states = new SwerveModuleState[4];
+		if(!Robot.isReal()&&Constants.mode == Constants.Mode.SIM){
+			mPeriodicIO.heading = new Rotation2d(driveSimulation.getGyroSimulation().getGyroReading());
+			mPeriodicIO.pitch =0;
+			for (int i = 0; i < mModules.length; i++) {
+				module_states[i] = driveSimulation.getModules()[i].getCurrentState();
+			}
+		}else{
 		for (SwerveModule swerveModule : mModules) {
 			swerveModule.readPeriodicInputs();
 		}
 		mPeriodicIO.heading = mPigeon.getYaw();
 		mPeriodicIO.pitch = mPigeon.getPitch();
-		states = getModuleStates();
+		module_states = getModuleStates();
+}
 
 		mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 		Twist2d twist_vel = Constants.SwerveConstants.kKinematics
-				.toChassisSpeeds()
+				.toChassisSpeeds(module_states)
 				.toTwist2d();
 		Translation2d translation_vel = new Translation2d(twist_vel.dx, twist_vel.dy);
 		translation_vel = translation_vel.rotateBy(getHeading());
@@ -315,6 +321,8 @@ public class Drive extends Subsystem {
 				translation_vel.getTranslation().x(),
 				translation_vel.getTranslation().y(),
 				twist_vel.dtheta);
+		mPeriodicIO.timestamp = Timer.getFPGATimestamp();
+
 	}
 
 	/**
