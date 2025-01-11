@@ -43,7 +43,7 @@ public class Robot extends LoggedRobot {
     ControlBoard controlBoard = ControlBoard.getInstance();
     // public LoggedDashboardChooser<AutoBase> autoChooser = new LoggedDashboardChooser<>("AutoChooser");
     private final Looper mEnabledLooper = new Looper();
-    SwerveDriveSimulation drivesim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d().wpi());
+    SwerveDriveSimulation drivesim = new SwerveDriveSimulation(Drive.mapleSimConfig,new Pose2d(3,3,Rotation2d.identity()).wpi());
     Drive drive;
   // HashMap<String,AutoBase> autos = new HashMap<String,AutoBase>();
     @Override
@@ -83,7 +83,6 @@ if (isReal()) {
 
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
           Drive.registerDriveSimulation(drivesim);
-          Pigeon.registerGyroSimulation(drivesim.getGyroSimulation());
           SimulatedArena.getInstance().addDriveTrainSimulation(drivesim);
       drive = Drive.getInstance();
       drive.resetModulesToAbsolute();
@@ -179,8 +178,17 @@ boolean disableGyroReset = false;
     public void testPeriodic() {
     }
     @Override
+    public void simulationInit() {
+        SimulatedArena.getInstance().resetFieldForAuto();
+    }
+    @Override
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
+        Logger.recordOutput("FieldSimulation/RobotPosition", drivesim.getSimulatedDriveTrainPose());
+        Logger.recordOutput(
+                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+        Logger.recordOutput(
+                "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     }
   }
  

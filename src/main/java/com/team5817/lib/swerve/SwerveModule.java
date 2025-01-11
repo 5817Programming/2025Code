@@ -135,20 +135,20 @@ public class SwerveModule extends Subsystem {
 			mOutputs.drivePercent = rotorSpeed * SwerveConstants.kV;
 	}
 
-	// public void setVelocity(SwerveModuleState desiredState) {
-	// 	double flip = setSteeringAngleOptimized(new Rotation2d(desiredState.angle)) ? -1 : 1;
-	// 	mOutputs.targetVelocity = desiredState.speedMetersPerSecond * flip;
-	// 	double rotorSpeed = Conversions.MPSToRPS(
-	// 		mOutputs.targetVelocity,
-	// 			Constants.SwerveConstants.wheelCircumference,
-	// 			Constants.SwerveConstants.driveGearRatio);
+	public void setVelocity(SwerveModuleState desiredState) {
+		double flip = setSteeringAngleOptimized(new Rotation2d(desiredState.angle)) ? -1 : 1;
+		mOutputs.driveVelocity = desiredState.speedMetersPerSecond * flip;
+		mOutputs.driveVelocity = Conversions.MPSToRPS(
+			mOutputs.driveVelocity,
+				Constants.SwerveConstants.wheelCircumference,
+				Constants.SwerveConstants.driveGearRatio);
 
-	// 	if (Math.abs(rotorSpeed) < 0.002) {
-	// 		mOutputs.driveDemand = new NeutralOut();
-	// 	} else {
-	// 		mOutputs.driveDemand = new VelocityVoltage(rotorSpeed);
-	// 	}
-	// }
+		if (Math.abs(mOutputs.driveVelocity) < 0.002) {
+			mOutputs.driveType = DriveType.NUETRAL;
+		}else {
+			mOutputs.driveType = DriveType.VELOCITY;
+		}
+	}
 
 	private boolean setSteeringAngleOptimized(Rotation2d steerAngle) {
 		boolean flip = false;
@@ -224,7 +224,6 @@ public class SwerveModule extends Subsystem {
 		Logger.recordOutput("Drive/Module" + kModuleNumber + "/Wheel Velocity Error",
 				Math.abs(getCurrentVelocity()) - Math.abs(mOutputs.driveVelocity));
 
-		Logger.recordOutput("Drive/Module" + kModuleNumber + "/Swerve Moduke State", new edu.wpi.first.math.kinematics.SwerveModuleState(mOutputs.driveVelocity, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(target_angle))); 
 		// spotless:on
 	}
 

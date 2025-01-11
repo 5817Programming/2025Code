@@ -6,6 +6,7 @@
 package com.team254.lib.swerve;
 
 import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.geometry.Twist2d;
 
 import edu.wpi.first.util.struct.StructSerializable;
@@ -47,6 +48,11 @@ public class ChassisSpeeds implements StructSerializable{
         this.vyMetersPerSecond = vyMetersPerSecond;
         this.omegaRadiansPerSecond = omegaRadiansPerSecond;
     }
+    public ChassisSpeeds(edu.wpi.first.math.kinematics.ChassisSpeeds wpi){
+        this.vxMetersPerSecond = wpi.vxMetersPerSecond;
+        this.vyMetersPerSecond = wpi.vyMetersPerSecond;
+        this.omegaRadiansPerSecond = wpi.omegaRadiansPerSecond;
+    }
 
 
     /**
@@ -74,12 +80,20 @@ public class ChassisSpeeds implements StructSerializable{
                 omegaRadiansPerSecond);
     }
 
+
     public static ChassisSpeeds fromRobotRelativeSpeeds(
             double vxMetersPerSecond,
             double vyMetersPerSecond,
             double omegaRadiansPerSecond) {
         return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
     }
+    public edu.wpi.first.math.kinematics.ChassisSpeeds wpi(){
+        return new edu.wpi.first.math.kinematics.ChassisSpeeds(vxMetersPerSecond,vyMetersPerSecond,omegaRadiansPerSecond);
+    }
+    public Translation2d getTranslation(){
+        return new Translation2d(vxMetersPerSecond,vyMetersPerSecond);
+    }
+    
 
     public Twist2d toTwist2d() {
         return new Twist2d(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);

@@ -16,7 +16,7 @@ public class Pose2dStruct implements Struct<Pose2d> {
 
   @Override
   public String getTypeName() {
-    return "Pose2d";
+    return "Pose2d+";
   }
 
   @Override

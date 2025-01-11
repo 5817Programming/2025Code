@@ -22,6 +22,10 @@ public class SwerveModuleState implements Comparable<SwerveModuleState>,StructSe
     /** Angle of the module. */
     public Rotation2d angle = Rotation2d.fromDegrees(0);
 
+    public edu.wpi.first.math.kinematics.SwerveModuleState wpi(){
+        return new edu.wpi.first.math.kinematics.SwerveModuleState(speedMetersPerSecond,angle.wpi());
+    }
+
     /** Constructs a SwerveModuleState with zeros for speed and angle. */
     public SwerveModuleState() {}
 
@@ -40,6 +44,10 @@ public class SwerveModuleState implements Comparable<SwerveModuleState>,StructSe
         this.speedMetersPerSecond = speedMetersPerSecond;
         this.distanceMeters = distanceMeters;
         this.angle = angle;
+    }
+    public SwerveModuleState(edu.wpi.first.math.kinematics.SwerveModuleState wpi){
+        this.speedMetersPerSecond = wpi.speedMetersPerSecond;
+        this.angle = new Rotation2d(wpi.angle);
     }
 
     @Override
@@ -73,9 +81,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState>,StructSe
         return String.format(
                 "SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond, angle);
     }
-    public edu.wpi.first.math.kinematics.SwerveModuleState wpi(){
-        return new edu.wpi.first.math.kinematics.SwerveModuleState(speedMetersPerSecond,angle.wpi());
-    }
+    
 
     /**
      * Minimize the change in heading the desired swerve module state would require by potentially

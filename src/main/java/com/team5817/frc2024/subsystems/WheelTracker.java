@@ -2,16 +2,20 @@ package com.team5817.frc2024.subsystems;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.team5817.frc2024.Constants;
+import com.team5817.frc2024.Robot;
 import com.team5817.lib.drivers.Pigeon;
 import com.team5817.lib.swerve.SwerveModule;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
+import com.team254.lib.swerve.ChassisSpeeds;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -165,8 +169,13 @@ public class WheelTracker extends Subsystem{
 			last_sample_timestamp = timestamp;
 			last_velocity_sample = new_pose;
 		}
-
+		if(Robot.isReal()){
 		inputs.pose = new_pose;
+		inputs.velocity = robotVelocity;
+		}else{
+			inputs.pose = new Pose2d(Drive.driveSimulation.getSimulatedDriveTrainPose());
+			inputs.velocity = new ChassisSpeeds(Drive.driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative()).getTranslation();
+		}
 		resetModulePoses(inputs.pose);
 	}
 	@AutoLog
