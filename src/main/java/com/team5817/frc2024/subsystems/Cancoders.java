@@ -1,21 +1,17 @@
 package com.team5817.frc2024.subsystems;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.team5817.frc2024.Ports;
 import com.team254.lib.drivers.CanDeviceId;
+import com.team5817.frc2024.Ports;
 
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
 
-// Conatiner to hold the Cancoders so we can initialize them
-// earlier than everything else and DI them to the swerve modules
+/**
+ * Container to hold the Cancoders so we can initialize them
+ * earlier than everything else and DI them to the swerve modules.
+ */
 public class Cancoders {
 	private final CANcoder mFrontLeft;
 	private final CANcoder mFrontRight;
@@ -29,16 +25,29 @@ public class Cancoders {
 
 	private static final double kBootUpErrorAllowanceTime = 10.0;
 
+	/**
+	 * Observer class to monitor CANcoder timestamp updates.
+	 */
 	private static class CanTsObserver {
 		private final CANcoder cancoder;
 		private Optional<Double> lastTs = Optional.empty();
 		private int validUpdates = 0;
 		private static final int kRequiredValidTimestamps = 10;
 
+		/**
+		 * Constructs a CanTsObserver for the given CANcoder.
+		 *
+		 * @param cancoder the CANcoder to observe
+		 */
 		public CanTsObserver(CANcoder cancoder) {
 			this.cancoder = cancoder;
 		}
 
+		/**
+		 * Checks if the CANcoder has received the required number of valid timestamp updates.
+		 *
+		 * @return true if the required number of valid updates have been received, false otherwise
+		 */
 		public boolean hasUpdate() {
 			// Need to call this to update ts
 			StatusSignal<Angle> absolutePositionSignal = cancoder.getAbsolutePosition();
@@ -57,6 +66,11 @@ public class Cancoders {
 
 	private static Cancoders sInstance;
 
+	/**
+	 * Returns the singleton instance of the Cancoders class.
+	 *
+	 * @return the singleton instance
+	 */
 	public static Cancoders getInstance() {
 		if (sInstance == null) {
 			sInstance = new Cancoders();
@@ -64,33 +78,48 @@ public class Cancoders {
 		return sInstance;
 	}
 
+	/**
+	 * Builds and configures a CANcoder with the given device ID.
+	 *
+	 * @param canDeviceId the device ID of the CANcoder
+	 * @return the configured CANcoder
+	 */
 	private CANcoder build(CanDeviceId canDeviceId) {
 		CANcoder thisCancoder = new CANcoder(canDeviceId.getDeviceNumber(), canDeviceId.getBus());
-		CANcoderConfigurator configurator = thisCancoder.getConfigurator();
-		CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+		// CANcoderConfigurator configurator = thisCancoder.getConfigurator();
+		// double initpose = thisCancoder.getAbsolutePosition().getValue().in(Degree);
+		// CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
 
-		canCoderConfig.MagnetSensor.MagnetOffset = 0.0;
-		canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+		// canCoderConfig.MagnetSensor.MagnetOffset =
+		// -thisCancoder.getAbsolutePosition().getValueAsDouble()+initpose;
+		// canCoderConfig.MagnetSensor.SensorDirection =
+		// SensorDirectionValue.CounterClockwise_Positive;
 
-		double startTime = Timer.getFPGATimestamp();
-		boolean timedOut = false;
-		boolean goodInit = false;
-		int attempt = 1;
-		while (!goodInit && !timedOut && attempt < 20) {
-			System.out.println("Initing CANCoder " + canDeviceId.getDeviceNumber() + " / attempt: " + attempt + " / "
-					+ (Timer.getFPGATimestamp() - startTime) + " seconds elapsed");
-			StatusCode settingsCode = configurator.apply(canCoderConfig);
-			StatusCode sensorCode = thisCancoder.getAbsolutePosition().setUpdateFrequency(20);
+		// double startTime = Timer.getFPGATimestamp();
+		// boolean timedOut = false;
+		// boolean goodInit = false;
+		// int attempt = 1;
+		// while (!goodInit && !timedOut && attempt < 20) {
+		// System.out.println("Initing CANCoder " + canDeviceId.getDeviceNumber() + " /
+		// attempt: " + attempt + " / "
+		// + (Timer.getFPGATimestamp() - startTime) + " seconds elapsed");
+		// StatusCode settingsCode = configurator.apply(canCoderConfig);
+		// StatusCode sensorCode =
+		// thisCancoder.getAbsolutePosition().setUpdateFrequency(20);
 
-			goodInit = settingsCode == StatusCode.OK && sensorCode == StatusCode.OK;
+		// goodInit = settingsCode == StatusCode.OK && sensorCode == StatusCode.OK;
 
-			timedOut = (Timer.getFPGATimestamp()) - startTime >= kBootUpErrorAllowanceTime;
-			attempt++;
-		}
+		// timedOut = (Timer.getFPGATimestamp()) - startTime >=
+		// kBootUpErrorAllowanceTime;
+		// attempt++;
+		// }
 
 		return thisCancoder;
 	}
 
+	/**
+	 * Constructs the Cancoders instance and initializes the CANcoders.
+	 */
 	private Cancoders() {
 		mFrontLeft = build(Ports.FL_CANCODER);
 		mFrontLeftObserver = new CanTsObserver(mFrontLeft);
@@ -105,6 +134,11 @@ public class Cancoders {
 		mBackRightObserver = new CanTsObserver(mBackRight);
 	}
 
+	/**
+	 * Checks if all CANcoders have been initialized with valid timestamp updates.
+	 *
+	 * @return true if all CANcoders have been initialized, false otherwise
+	 */
 	public boolean allHaveBeenInitialized() {
 		return mFrontLeftObserver.hasUpdate()
 				&& mFrontRightObserver.hasUpdate()
@@ -112,18 +146,38 @@ public class Cancoders {
 				&& mBackRightObserver.hasUpdate();
 	}
 
+	/**
+	 * Returns the front left CANcoder.
+	 *
+	 * @return the front left CANcoder
+	 */
 	public CANcoder getFrontLeft() {
 		return mFrontLeft;
 	}
 
+	/**
+	 * Returns the front right CANcoder.
+	 *
+	 * @return the front right CANcoder
+	 */
 	public CANcoder getFrontRight() {
 		return mFrontRight;
 	}
 
+	/**
+	 * Returns the back left CANcoder.
+	 *
+	 * @return the back left CANcoder
+	 */
 	public CANcoder getBackLeft() {
 		return mBackLeft;
 	}
 
+	/**
+	 * Returns the back right CANcoder.
+	 *
+	 * @return the back right CANcoder
+	 */
 	public CANcoder getBackRight() {
 		return mBackRight;
 	}

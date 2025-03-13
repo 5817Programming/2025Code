@@ -65,8 +65,8 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
 
 if (isReal()) {
-    Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-    Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    //Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+    //Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     if(Constants.mode == Constants.Mode.REPLAY) {
@@ -76,14 +76,12 @@ if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
       setUseTiming(false);
     }else{
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      //Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging  
     }
 }
 
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
-          Drive.registerDriveSimulation(drivesim);
-          SimulatedArena.getInstance().addDriveTrainSimulation(drivesim);
       drive = Drive.getInstance();
       drive.resetModulesToAbsolute();
       mSubsystemManager = SubsystemManager.getInstance();
