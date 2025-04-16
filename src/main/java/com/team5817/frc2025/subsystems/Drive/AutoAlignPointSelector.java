@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class AutoAlignPointSelector {
-    public static AlignmentPoint a;
+    public static AlignmentPoint a = new AlignmentPoint(null, null);
     /**
      * Gets the set of AprilTags based on the current alliance color.
      * 

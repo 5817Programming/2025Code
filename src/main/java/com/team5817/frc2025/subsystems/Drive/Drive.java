@@ -147,7 +147,6 @@ public class Drive extends Subsystem {
 		mPigeon.setYaw(0.0);
 		mWheelTracker = new WheelTracker(mModules);
 		mSetpointGenerator = new SwerveSetpointGenerator(SwerveConstants.kKinematics);
-		findTargetPoint();
 		mAutoAlignMotionPlanner.reset();
 		
 		
