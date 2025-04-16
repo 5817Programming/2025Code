@@ -511,7 +511,7 @@ public class Constants {
 			
 			kElevatorServoConstants.kHomingTimeout = 0.1;
 			kElevatorServoConstants.kHomingOutput = -.05;
-			kElevatorServoConstants.kHomingVelocityWindow = 0.05;
+			kElevatorServoConstants.kHomingVelocityWindow = 0.01;
 
 		}
 
