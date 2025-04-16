@@ -628,7 +628,7 @@ public class Constants {
 
 			kWristServoConstants.kNeutralMode = NeutralModeValue.Brake;
 
-			kWristServoConstants.kHomingTimeout = .5;
+			kWristServoConstants.kHomingTimeout = .1;
 			kWristServoConstants.kHomingOutput = -.25;
 			kWristServoConstants.kHomingVelocityWindow = 1;
 		}
