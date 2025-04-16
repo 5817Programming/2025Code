@@ -148,8 +148,6 @@ public class Drive extends Subsystem {
 		mWheelTracker = new WheelTracker(mModules);
 		mSetpointGenerator = new SwerveSetpointGenerator(SwerveConstants.kKinematics);
 		mAutoAlignMotionPlanner.reset();
-		
-		
 	}
 
 	/**
