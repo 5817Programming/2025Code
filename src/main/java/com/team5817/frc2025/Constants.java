@@ -510,7 +510,7 @@ public class Constants {
 			kElevatorServoConstants.kNeutralMode = NeutralModeValue.Brake;
 			
 			kElevatorServoConstants.kHomingTimeout = 0.1;
-			kElevatorServoConstants.kHomingOutput = -.05;
+			kElevatorServoConstants.kHomingOutput = -.15;
 			kElevatorServoConstants.kHomingVelocityWindow = 0.01;
 
 		}
