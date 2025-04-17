@@ -64,7 +64,6 @@ public class DriverControls {
 	boolean swap = false;
 	boolean climbAllowed = false;
 	boolean autoAlignAllowed = true;
-	boolean codriverManual = false;
 	CustomXboxController driver = mControlBoard.driver;
 	CustomXboxController codriver = mControlBoard.operator;
 	/* TWO CONTROLLERS */
@@ -72,6 +71,7 @@ public class DriverControls {
 	double lastTime = 0;
 
 	boolean wantStow = false;
+	GoalState l2m = GoalState.L2;
 	/**
 	 * Handles the input for the two controller mode.
 	 * This mode is used when both driver and co-driver controllers are available.
@@ -176,7 +176,15 @@ public class DriverControls {
 		if(codriver.bButton.isBeingPressed())
 			preparedGoal = GoalState.L3;
 		if(codriver.aButton.isBeingPressed())
-			preparedGoal = GoalState.L2;
+			preparedGoal = l2m;
+		if(driver.POV0.isBeingPressed()){
+			l2m = GoalState.L2A;
+			preparedGoal = l2m;
+		}
+		if(codriver.rightBumper.isBeingPressed()){
+			l2m = GoalState.L2;
+			preparedGoal = l2m;
+		}
 		
 		
 		if(codriver.xButton.isBeingPressed())
@@ -188,21 +196,6 @@ public class DriverControls {
 			preparedGoal = GoalState.PROCESS;
 		}
 		
-		if(codriver.getBackButtonPressed()){
-			codriverManual = !codriverManual;
-		}
-		if(codriverManual){
-			if(lastTime==0)
-				lastTime = Timer.getFPGATimestamp();
-			double dt = Timer.getTimestamp()-lastTime;
-			s.mElevator.changeManualOffset(-codriver.getLeftY()*dt*0.0254);
-			s.mEndEffectorWrist.changeManualOffset(-codriver.getRightY()*dt*50);
-			if(codriver.getLeftBumperButtonPressed())
-				s.mElevator.setManualOffset(0);
-			if(codriver.getRightBumperButtonPressed())
-				s.mEndEffectorWrist.setManualOffset(0);
-		lastTime = Timer.getTimestamp();
-		}
 		if(codriver.POV270.wasReleased())
 			s.mElevator.home();
 		if(codriver.POV90.wasReleased())
@@ -212,7 +205,6 @@ public class DriverControls {
 			driver.rumble(6, .5);
 		
 
-		Logger.recordOutput("Elastic/Codriver Manual", codriverManual);
 		Logger.recordOutput("Elastic/Auto Align Allowed", autoAlignAllowed);
 		Logger.recordOutput("Elastic/Climb Allowed", climbAllowed);
 		Logger.recordOutput("Elastic/PreparedGoal", preparedGoal);
