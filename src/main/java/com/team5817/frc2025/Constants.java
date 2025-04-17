@@ -519,7 +519,7 @@ public class Constants {
 		public static final double kCoralClearHeight = 0.15; // rotations
         public static final InterpolatingDoubleTreeMap kMidOffsetMap = new InterpolatingDoubleTreeMap();
 		static {
-			kMidOffsetMap.put(-.112, -0.119804);
+			kMidOffsetMap.put(-.112, -0.149804);
 			kMidOffsetMap.put(0.0, 0.0);
 		}public static final InterpolatingDoubleTreeMap kHighOffsetMap = new InterpolatingDoubleTreeMap();
 		static {
