@@ -73,6 +73,6 @@ public class TrajectoryAction implements Action{
 	 */
 	@Override
 	public void done() {
-		System.out.println("Segement Complete");
+		System.out.println("Auto:Segement Complete");
 	}
 }
