@@ -72,6 +72,7 @@ public class DriverControls {
 
 	boolean wantStow = false;
 	GoalState l2m = GoalState.L2;
+	GoalState l3m = GoalState.L3;
 	/**
 	 * Handles the input for the two controller mode.
 	 * This mode is used when both driver and co-driver controllers are available.
@@ -174,16 +175,24 @@ public class DriverControls {
 		if(codriver.yButton.isBeingPressed())
 			preparedGoal = GoalState.L4;
 		if(codriver.bButton.isBeingPressed())
-			preparedGoal = GoalState.L3;
+			preparedGoal = l3m;
 		if(codriver.aButton.isBeingPressed())
 			preparedGoal = l2m;
 		if(driver.POV0.isBeingPressed()){
-			l2m = GoalState.L2A;
+			l3m = GoalState.L3O;
+			preparedGoal = l3m;
+		}
+		if(driver.POV180.isBeingPressed()){
+			l2m = GoalState.L2O;
+			preparedGoal = l2m;
+		}
+		if(codriver.leftBumper.isBeingPressed()){
+			l2m = GoalState.L2;
 			preparedGoal = l2m;
 		}
 		if(codriver.rightBumper.isBeingPressed()){
-			l2m = GoalState.L2;
-			preparedGoal = l2m;
+			l3m = GoalState.L3;
+			preparedGoal = l3m;
 		}
 		
 		
