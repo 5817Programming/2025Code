@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Translation2d;
 import com.team5817.frc2025.field.AlignmentPoint;
 import com.team5817.frc2025.field.AprilTag;
 import com.team5817.frc2025.field.FieldLayout;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class AutoAlignPointSelector {
-    public static AlignmentPoint a;
+    public static AlignmentPoint a = new AlignmentPoint(new Translation2d(), AlignmentType.CORAL_SCORE);
     /**
      * Gets the set of AprilTags based on the current alliance color.
      * 

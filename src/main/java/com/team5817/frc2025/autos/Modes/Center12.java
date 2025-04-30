@@ -2,7 +2,6 @@ package com.team5817.frc2025.autos.Modes;
 
 import java.util.List;
 
-import com.team254.lib.swerve.ChassisSpeeds;
 import com.team5817.frc2025.Constants;
 import com.team5817.frc2025.Constants.AutoConstants;
 import com.team5817.frc2025.autos.AutoBase;
@@ -12,14 +11,11 @@ import com.team5817.frc2025.autos.Actions.SequentialAction;
 import com.team5817.frc2025.autos.Actions.TrajectoryAction;
 import com.team5817.frc2025.autos.Actions.WaitAction;
 import com.team5817.frc2025.autos.Actions.WaitToPassDistanceToReef;
-import com.team5817.frc2025.autos.Actions.WaitForBooleanAction;
 import com.team5817.frc2025.autos.AutoModeSelector.StartingPosition;
 import com.team5817.frc2025.autos.Actions.WaitForSuperstructureAction;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Drive.Drive;
-import com.team5817.frc2025.subsystems.Drive.Drive.DriveControlState;
-import com.team5817.frc2025.subsystems.Elevator.Elevator;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
 import com.team5817.lib.motion.Trajectory;
 import com.team5817.lib.motion.TrajectorySet;
@@ -118,7 +114,7 @@ public class Center12 extends AutoBase {
 	public void scoreNet(){
 		s.setReadyToScore(false);
 		r(new ParallelAction(List.of(
-            new TrajectoryAction(t.next()),
+            new TrajectoryAction(t.next(),0.5),
             new SequentialAction(List.of(
                 new WaitToPassDistanceToReef(AutoConstants.exitDistance),
                 new LambdaAction(()->{
