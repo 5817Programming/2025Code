@@ -47,7 +47,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 /**
- * The main robot class that extends LoggedRobot and contains the robot's lifecycle methods.
+ * The main robot class that extends LoggedRobot and contains the robot's
+ * lifecycle methods.
  */
 public class Robot extends LoggedRobot {
   SubsystemManager mSubsystemManager;
@@ -62,19 +63,21 @@ public class Robot extends LoggedRobot {
 
   @SuppressWarnings("resource")
   /**
-   * This method is called when the robot is first started up and should be used for any initialization code.
+   * This method is called when the robot is first started up and should be used
+   * for any initialization code.
    */
   @Override
   public void robotInit() {
-    if(Robot.isReal())
-      RobotMode.mode = RobotMode.Mode.REAL;
+    if (Robot.isReal())
+      RobotMode.setMode(RobotMode.Mode.REAL);
+
     DriverStation.silenceJoystickConnectionWarning(true);
     for (int port = 5800; port <= 5809; port++) {
       PortForwarder.add(port, "limelight-right.local", port);
       PortForwarder.add(port + 10, "limelight-left.local", port);
       PortForwarder.add(port + 20, "limelight-up.local", port);
-
     }
+
     DriverStation.startDataLog(DataLogManager.getLog());
 
     RobotState.getInstance().reset();
@@ -82,12 +85,12 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
 
-    if (RobotMode.mode == RobotMode.Mode.REAL) {
+    if (RobotMode.isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     } else {
-      if (RobotMode.mode == RobotMode.Mode.REPLAY) {
+      if (RobotMode.isReplay()) {
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
         Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
@@ -120,8 +123,7 @@ public class Robot extends LoggedRobot {
         Elevator.getInstance(),
         EndEffectorRollers.getInstance(),
         EndEffectorWrist.getInstance(),
-        Intake.getInstance()
-        );
+        Intake.getInstance());
 
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
     mEnabledLooper.start();
@@ -132,10 +134,11 @@ public class Robot extends LoggedRobot {
    * This method is called periodically, regardless of the robot's mode.
    */
   boolean needsZero = true;
+
   @Override
   public void robotPeriodic() {
-    if(needsZero&&DriverStation.getAlliance().isPresent()){
-      mDrive.zeroGyro(Util.isRed().get()?0:180);
+    if (needsZero && DriverStation.getAlliance().isPresent()) {
+      mDrive.zeroGyro(Util.isRed().get() ? 0 : 180);
       needsZero = false;
     }
     Logger.recordOutput("Elastic/Match Time", Timer.getMatchTime());
@@ -153,9 +156,6 @@ public class Robot extends LoggedRobot {
     neverEnabled = false;
     Elastic.selectTab("Autonomous");
     mAutoExecuter.start();
-    // Superstructure.getInstance().setState(Superstructure.AUTO);
-    // autoExecuter.setAuto(auto);
-    // autoExecuter.start();
   }
 
   /** This function is called periodically during autonomous. */
@@ -163,7 +163,9 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {
 
   }
+
   boolean neverEnabled = true;
+
   /**
    * This method is called once each time the robot enters teleoperated mode.
    */
@@ -172,14 +174,12 @@ public class Robot extends LoggedRobot {
     EndEffectorWrist.getInstance().setManualOffset(0);
     Elevator.getInstance().setManualOffset(0);
     neverEnabled = false;
-		mDrive.setControlState(Drive.DriveControlState.OPEN_LOOP);
+    mDrive.setControlState(Drive.DriveControlState.OPEN_LOOP);
 
     Elastic.selectTab("Teleoperated");
     mDrive.resetModulesToAbsolute();
-    // swerve.fieldzeroSwerve();
-    mDrive.feedTeleopSetpoint(new ChassisSpeeds(0, 0, 0));
+    mDrive.feedTeleopSetpoint(new ChassisSpeeds());
     mDrive.setOpenLoop(new ChassisSpeeds());
-
   }
 
   /**
@@ -188,7 +188,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     controls.twoControllerMode();
-    // controls.oneControllerMode();
     controlBoard.update();
 
     mDrive.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -205,10 +204,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     mSubsystemManager.stop();
-    // Superstructure.getInstance().clearQueues();
-    // autoExecuter.stop();
 
-    if(mAutoExecuter!=null){
+    if (mAutoExecuter != null) {
       mAutoExecuter.stop();
     }
     mAutoExecuter = new AutoExecuter();
@@ -219,21 +216,16 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void disabledPeriodic() {
-    
     l.update();
     // if(mVision.getMovingAverage().getSize()!=0&&neverEnabled)
-    //   mDrive.zeroGyro(mVision.getMovingAverage().getAverage());
+    // mDrive.zeroGyro(mVision.getMovingAverage().getAverage());
     mAutoModeSelector.updateModeCreator();
     Optional<AutoBase> autoMode = mAutoModeSelector.getAutoMode();
     if (autoMode.isPresent() && (autoMode.get() != mAutoExecuter.getAuto())) {
-      if (RobotMode.mode == RobotMode.Mode.SIM) 
+      if (RobotMode.isSim())
         autoMode.get().registerDriveSimulation(mDriveSim);
       mAutoExecuter.setAuto(autoMode.get());
-      
     }
-
-    // if(!disableGyroReset)
-    // drive.zeroGyro(mVision.getMovingAverageRead());
   }
 
   /**
@@ -242,18 +234,14 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     Elastic.selectTab("Systems Test");
-    // mAutoExecuter.setAuto(new TestRoutine()); 
 
-    mAutoExecuter.setAuto(new Characterize(Elevator.getInstance(),true));
+    mAutoExecuter.setAuto(new Characterize(Elevator.getInstance(), true));
     mAutoExecuter.start();
-    // ControlBoard.getInstance().
-    // Elevator.getInstance().applyVoltage(-1.2);
-
   }
 
   /**
    * This method is called periodically during test mode.
-   */      
+   */
   @Override
   public void testPeriodic() {
     Elevator.getInstance().writePeriodicOutputs();
@@ -262,10 +250,11 @@ public class Robot extends LoggedRobot {
     // controlBoard.update();
 
     // mDrive.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
-    //     controlBoard.getSwerveTranslation().x(),
-    //     controlBoard.getSwerveTranslation().y(),
-    //     controlBoard.getSwerveRotation(),
-    //     Util.robotToFieldRelative(mDrive.getHeading(), DriverStation.getAlliance().get().equals(Alliance.Red))));
+    // controlBoard.getSwerveTranslation().x(),
+    // controlBoard.getSwerveTranslation().y(),
+    // controlBoard.getSwerveRotation(),
+    // Util.robotToFieldRelative(mDrive.getHeading(),
+    // DriverStation.getAlliance().get().equals(Alliance.Red))));
   }
 
   /**
@@ -273,8 +262,8 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void simulationInit() {
-    if(RobotMode.mode == RobotMode.Mode.SIM)
-    SimulatedArena.getInstance().resetFieldForAuto();
+    if (RobotMode.isSim())
+      SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   /**
@@ -282,13 +271,13 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void simulationPeriodic() {
-    if(RobotMode.mode == RobotMode.Mode.SIM){
-    SimulatedArena.getInstance().simulationPeriodic();
-    Logger.recordOutput("FieldSimulation/RobotPosition", mDriveSim.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-}
+    if (RobotMode.isSim()) {
+      SimulatedArena.getInstance().simulationPeriodic();
+      Logger.recordOutput("FieldSimulation/RobotPosition", mDriveSim.getSimulatedDriveTrainPose());
+      Logger.recordOutput(
+          "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+      Logger.recordOutput(
+          "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    }
   }
 }
