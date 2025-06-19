@@ -1,6 +1,5 @@
 package com.team5817.frc2025.autos;
 
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import com.team5817.frc2025.autos.Actions.Action;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -9,7 +8,6 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public abstract class AutoBase {
 
-    protected SwerveDriveSimulation mSim;
     protected double startTime;
     boolean mActive = false;
 
@@ -62,14 +60,5 @@ public abstract class AutoBase {
         action.done();
         if (!mActive)
             throw new Error("Action Interrupted");
-    }
-
-    /**
-     * Registers a drive simulation.
-     * 
-     * @param sim The drive simulation to register.
-     */
-    public void registerDriveSimulation(SwerveDriveSimulation sim) {
-        mSim = sim;
     }
 }

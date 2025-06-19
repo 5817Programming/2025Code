@@ -1,4 +1,4 @@
-package com.team5817.frc2025.subsystems.vision;
+package com.team5817.frc2025.subsystems.Vision;
 
 //LimelightHelpers v1.10 (REQUIRES LLOS 2024.9.1 OR LATER)
 

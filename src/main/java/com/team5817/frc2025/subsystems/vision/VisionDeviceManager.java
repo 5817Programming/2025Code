@@ -1,10 +1,11 @@
-package com.team5817.frc2025.subsystems.vision;
+package com.team5817.frc2025.subsystems.Vision;
 
 import com.team5817.frc2025.RobotConstants;
 import com.team5817.frc2025.RobotState;
 import com.team5817.frc2025.RobotState.VisionUpdate;
 import com.team5817.frc2025.loops.ILooper;
 import com.team5817.frc2025.loops.Loop;
+import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.lib.RobotMode;
 import com.team5817.lib.drivers.Subsystem;
 import com.team254.lib.geometry.Translation2d;
@@ -18,23 +19,6 @@ import org.littletonrobotics.junction.Logger;
  * Manages vision devices and processes vision data.
  */
 public class VisionDeviceManager extends Subsystem {
-
-  /**
-   * Singleton instance of VisionDeviceManager.
-   */
-  public static VisionDeviceManager mInstance;
-
-  /**
-   * Returns the singleton instance of VisionDeviceManager.
-   * 
-   * @return the singleton instance.
-   */
-  public static VisionDeviceManager getInstance() {
-    if (mInstance == null) {
-      mInstance = new VisionDeviceManager();
-    }
-    return mInstance;
-  }
 
   private VisionDevice mRightCamera;
   private VisionDevice mLeftCamera;
@@ -50,10 +34,11 @@ public class VisionDeviceManager extends Subsystem {
   /**
    * Constructor for VisionDeviceManager.
    */
-  public VisionDeviceManager() {
-    mRightCamera = new VisionDevice("limelight-right");
-    mLeftCamera = new VisionDevice("limelight-left");
-    mUpCamera = new VisionDevice("limelight-up");
+
+  public VisionDeviceManager(VisionDeviceIO FrontLeft, VisionDeviceIO FrontRight, VisionDeviceIO Up) {
+    mRightCamera = new VisionDevice("limelight-right", FrontRight);
+    mLeftCamera = new VisionDevice("limelight-left", FrontLeft);
+    mUpCamera = new VisionDevice("limelight-up", Up);
 
     mAllCameras = List.of(mRightCamera, mLeftCamera, mUpCamera);
   }
@@ -140,6 +125,14 @@ public class VisionDeviceManager extends Subsystem {
     }
     return bestDevice;
 
+  }
+
+  // **constructor**
+  public VisionDeviceManager(VisionDevice right, VisionDevice left, VisionDevice up) {
+    mRightCamera = right;
+    mLeftCamera = left;
+    mUpCamera = up;
+    mAllCameras = List.of(mRightCamera, mLeftCamera, mUpCamera);
   }
 
   /**

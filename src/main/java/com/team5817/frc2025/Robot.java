@@ -5,8 +5,6 @@
 package com.team5817.frc2025;
 
 import java.util.Optional;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -15,25 +13,17 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.team254.lib.geometry.Pose2d;
-import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.swerve.ChassisSpeeds;
 import com.team5817.BuildConstants;
 import com.team5817.frc2025.autos.AutoBase;
 import com.team5817.frc2025.autos.AutoExecuter;
-import com.team5817.frc2025.autos.AutoModeSelector;
+import com.team5817.frc2025.autos.AutoModeFactory;
 import com.team5817.frc2025.autos.Modes.Characterize;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.controlboard.ControlBoard;
 import com.team5817.frc2025.controlboard.DriverControls;
 import com.team5817.frc2025.loops.Looper;
-import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Drive.Drive;
-import com.team5817.frc2025.subsystems.Elevator.Elevator;
-import com.team5817.frc2025.subsystems.EndEffector.EndEffectorRollers;
-import com.team5817.frc2025.subsystems.EndEffector.EndEffectorWrist;
-import com.team5817.frc2025.subsystems.Intake.Intake;
-import com.team5817.frc2025.subsystems.vision.VisionDeviceManager;
 import com.team5817.lib.Elastic;
 import com.team5817.lib.Util;
 import com.team5817.lib.RobotMode;
@@ -51,14 +41,14 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
  * lifecycle methods.
  */
 public class Robot extends LoggedRobot {
-  SubsystemManager mSubsystemManager;
+  private RobotContainer mRobotContainer;
+  private SubsystemManager mSubsystemManager;
   private AutoExecuter mAutoExecuter;
-  private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
+  private AutoModeFactory mAutoModeSelector;
   DriverControls controls;
-  ControlBoard controlBoard = ControlBoard.getInstance();
+  ControlBoard controlBoard;
   private final Looper mEnabledLooper = new Looper();
 
-  SwerveDriveSimulation mDriveSim;
   Drive mDrive;
 
   @SuppressWarnings("resource")
@@ -98,9 +88,6 @@ public class Robot extends LoggedRobot {
                                                                                               // log
         setUseTiming(false);
       } else {
-        mDriveSim = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(13, 3, Rotation2d.identity()).wpi());
-        Drive.registerDriveSimulation(mDriveSim);
-        SimulatedArena.getInstance().addDriveTrainSimulation(mDriveSim);
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
       }
@@ -109,21 +96,16 @@ public class Robot extends LoggedRobot {
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
     l.init();
+    mRobotContainer = new RobotContainer();
 
-    mDrive = Drive.getInstance();
+    mDrive = mRobotContainer.mDrive;
+    mAutoModeSelector = new AutoModeFactory(mRobotContainer.mSuperstructure, mDrive);
     mSubsystemManager = SubsystemManager.getInstance();
 
     Elastic.selectTab("Pre Match");
 
-    controls = new DriverControls();
-    mSubsystemManager.setSubsystems(
-        Drive.getInstance(),
-        Superstructure.getInstance(),
-        VisionDeviceManager.getInstance(),
-        Elevator.getInstance(),
-        EndEffectorRollers.getInstance(),
-        EndEffectorWrist.getInstance(),
-        Intake.getInstance());
+    controls = new DriverControls(mDrive, mRobotContainer.mSuperstructure);
+    controlBoard = controls.mControlBoard;
 
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
     mEnabledLooper.start();
@@ -171,15 +153,13 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void teleopInit() {
-    EndEffectorWrist.getInstance().setManualOffset(0);
-    Elevator.getInstance().setManualOffset(0);
+    mRobotContainer.mEndEffectorWrist.setManualOffset(0);
+    mRobotContainer.mElevator.setManualOffset(0);
     neverEnabled = false;
     mDrive.setControlState(Drive.DriveControlState.OPEN_LOOP);
 
     Elastic.selectTab("Teleoperated");
-    mDrive.resetModulesToAbsolute();
-    mDrive.feedTeleopSetpoint(new ChassisSpeeds());
-    mDrive.setOpenLoop(new ChassisSpeeds());
+    mDrive.stop();
   }
 
   /**
@@ -190,7 +170,7 @@ public class Robot extends LoggedRobot {
     controls.twoControllerMode();
     controlBoard.update();
 
-    mDrive.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
+    mDrive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
         controlBoard.getSwerveTranslation().x(),
         controlBoard.getSwerveTranslation().y(),
         controlBoard.getSwerveRotation(),
@@ -222,8 +202,6 @@ public class Robot extends LoggedRobot {
     mAutoModeSelector.updateModeCreator();
     Optional<AutoBase> autoMode = mAutoModeSelector.getAutoMode();
     if (autoMode.isPresent() && (autoMode.get() != mAutoExecuter.getAuto())) {
-      if (RobotMode.isSim())
-        autoMode.get().registerDriveSimulation(mDriveSim);
       mAutoExecuter.setAuto(autoMode.get());
     }
   }
@@ -235,7 +213,7 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     Elastic.selectTab("Systems Test");
 
-    mAutoExecuter.setAuto(new Characterize(Elevator.getInstance(), true));
+    mAutoExecuter.setAuto(new Characterize(mRobotContainer.mElevator, true));
     mAutoExecuter.start();
   }
 
@@ -244,17 +222,8 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void testPeriodic() {
-    Elevator.getInstance().writePeriodicOutputs();
-    Elevator.getInstance().outputTelemetry();
-    // controls.testMode();
-    // controlBoard.update();
-
-    // mDrive.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
-    // controlBoard.getSwerveTranslation().x(),
-    // controlBoard.getSwerveTranslation().y(),
-    // controlBoard.getSwerveRotation(),
-    // Util.robotToFieldRelative(mDrive.getHeading(),
-    // DriverStation.getAlliance().get().equals(Alliance.Red))));
+    mRobotContainer.mElevator.writePeriodicOutputs();
+    mRobotContainer.mElevator.outputTelemetry();
   }
 
   /**
@@ -262,8 +231,6 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void simulationInit() {
-    if (RobotMode.isSim())
-      SimulatedArena.getInstance().resetFieldForAuto();
   }
 
   /**
@@ -271,13 +238,5 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void simulationPeriodic() {
-    if (RobotMode.isSim()) {
-      SimulatedArena.getInstance().simulationPeriodic();
-      Logger.recordOutput("FieldSimulation/RobotPosition", mDriveSim.getSimulatedDriveTrainPose());
-      Logger.recordOutput(
-          "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-      Logger.recordOutput(
-          "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-    }
   }
 }

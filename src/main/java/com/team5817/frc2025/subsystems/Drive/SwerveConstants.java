@@ -11,8 +11,6 @@ import com.team254.lib.motion.MotionProfileConstraints;
 import com.team254.lib.swerve.SwerveDriveKinematics;
 import com.team254.lib.swerve.SwerveKinematicLimits;
 import com.team5817.frc2025.RobotConstants;
-import com.team5817.frc2025.Ports;
-import com.team5817.lib.swerve.SwerveModule.SwerveModuleConstants;
 
 
 import edu.wpi.first.math.util.Units;
@@ -142,67 +140,6 @@ import edu.wpi.first.math.util.Units;
 				5,
 				-5,
 				maxAngularAcceleration * 0.5);
-
-		/*** MODULE SPECIFIC CONSTANTS ***/
-		/* Front Left Module - Module 0 */
-		/**
-		 * Constants specific to the front left swerve module.
-		 */
-		public static final class Mod0 {
-			public static final double compAngleOffset = 180;
-
-			public static SwerveModuleConstants SwerveModuleConstants() {
-				return new SwerveModuleConstants(
-						Ports.FL_DRIVE.getDeviceNumber(),
-						Ports.FL_ROTATION.getDeviceNumber(),
-						compAngleOffset);
-			}
-		}
-
-		/* Front Right Module - Module 1 */
-		/**
-		 * Constants specific to the front right swerve module.
-		 */
-		public static final class Mod1 {
-			public static final double compAngleOffset = 0;
-
-			public static com.team5817.lib.swerve.SwerveModule.SwerveModuleConstants SwerveModuleConstants() {
-				return new SwerveModuleConstants(
-						Ports.FR_DRIVE.getDeviceNumber(),
-						Ports.FR_ROTATION.getDeviceNumber(),
-						compAngleOffset);
-			}
-		}
-
-		/* Back Left Module - Module 2 */
-		/**
-		 * Constants specific to the back left swerve module.
-		 */
-		public static final class Mod2 {
-			public static final double compAngleOffset = 180;
-
-			public static SwerveModuleConstants SwerveModuleConstants() {
-				return new SwerveModuleConstants(
-						Ports.BL_DRIVE.getDeviceNumber(),
-						Ports.BL_ROTATION.getDeviceNumber(),
-						compAngleOffset);
-			}
-		}
-
-		/* Back Right Module - Module 3 */
-		/**
-		 * Constants specific to the back right swerve module.
-		 */
-		public static final class Mod3 {
-			public static final double compAngleOffset = 0;
-
-			public static SwerveModuleConstants SwerveModuleConstants() {
-				return new SwerveModuleConstants(
-						Ports.BR_DRIVE.getDeviceNumber(),
-						Ports.BR_ROTATION.getDeviceNumber(),
-						compAngleOffset);
-			}
-		}
 
 		public static TalonFXConfiguration DriveFXConfig(boolean inverse) {
 			TalonFXConfiguration config = new TalonFXConfiguration();

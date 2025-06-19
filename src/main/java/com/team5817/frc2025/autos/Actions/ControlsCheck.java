@@ -16,84 +16,84 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ControlsCheck implements Action{
+public class ControlsCheck implements Action {
 
-    public final EnumMap<GoalState, Boolean> mGoalMap = new EnumMap<>(Superstructure.GoalState.class);
+  public final EnumMap<GoalState, Boolean> mGoalMap = new EnumMap<>(Superstructure.GoalState.class);
 
-    public static List<String> statesToCheck = List.of(
-        "GROUND_CORAL_INTAKE",
-        "A2",
-        "L4",
-        "STOW",
-        "CLIMB_PREPARE",
-        "CLIMB_PULL",
-        "NET",
-        "PROCESS"
-    );
+  public static List<String> statesToCheck = List.of(
+      "GROUND_CORAL_INTAKE",
+      "A2",
+      "L4",
+      "STOW",
+      "CLIMB_PREPARE",
+      "CLIMB_PULL",
+      "NET",
+      "PROCESS");
 
-    public Superstructure s;
-    public DriverControls controls;
-    public ControlBoard controlBoard;
-    public Drive d;
+  public Superstructure s;
+  public DriverControls controls;
+  public ControlBoard controlBoard;
+  public Drive d;
 
-    public boolean goalsDone;
-    public boolean swerveChecked;
+  public boolean goalsDone;
+  public boolean swerveChecked;
 
-    @Override
-    public void done() {
-        controls = null;
+  public ControlsCheck(Superstructure superstructure, Drive drive) {
+    this.s = superstructure;
+    this.d = drive;
+  }
+
+  @Override
+  public void done() {
+    controls = null;
+  }
+
+  @Override
+  public void start() {
+    controlBoard = new ControlBoard(d);
+    controls = new DriverControls(d, s);
+
+    for (GoalState goal : GoalState.values()) {
+      if (statesToCheck.contains(goal.toString()))
+        mGoalMap.put(goal, false);
     }
 
-    @Override
-    public void start() {
-        controlBoard = ControlBoard.getInstance();
-        s = Superstructure.getInstance();
-        d = Drive.getInstance();
-        controls = new DriverControls();
+  }
 
-        for (GoalState goal : GoalState.values()) {
-            if(statesToCheck.contains(goal.toString()))
-                mGoalMap.put(goal, false);
-        }
+  @Override
+  public void update() {
+    controlBoard.update();
+    controls.twoControllerMode();
 
-    }
-
-    @Override
-    public void update() {
-        controlBoard.update();
-        controls.twoControllerMode();
-
-        d.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
+    d.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
         controlBoard.getSwerveTranslation().x(),
         controlBoard.getSwerveTranslation().y(),
         controlBoard.getSwerveRotation(),
         Util.robotToFieldRelative(d.getHeading(), DriverStation.getAlliance().get().equals(Alliance.Red))));
 
-        if(new Translation2d(controlBoard.getSwerveTranslation().x(), controlBoard.getSwerveTranslation().y()).norm() >.5)
-            swerveChecked = true;
+    if (new Translation2d(controlBoard.getSwerveTranslation().x(), controlBoard.getSwerveTranslation().y()).norm() > .5)
+      swerveChecked = true;
 
-        var currentGoal = s.getGoalState();
-        if(statesToCheck.contains(currentGoal.toString())){
-            if(mGoalMap.get(currentGoal) != true){
-                mGoalMap.put(currentGoal, true);
-            }
-        }
-        for (GoalState goal : mGoalMap.keySet()) {
-            SmartDashboard.putBoolean("TestRoutine/" +goal.toString(), mGoalMap.get(goal));
-        }
+    var currentGoal = s.getGoalState();
+    if (statesToCheck.contains(currentGoal.toString())) {
+      if (mGoalMap.get(currentGoal) != true) {
+        mGoalMap.put(currentGoal, true);
+      }
     }
-
-
-
-    @Override
-    public boolean isFinished(){
-        goalsDone = true;
-        for(boolean value: mGoalMap.values()){
-            if(!value){
-                goalsDone = false;
-                break;
-            }
-        }
-        return goalsDone && swerveChecked;
+    for (GoalState goal : mGoalMap.keySet()) {
+      SmartDashboard.putBoolean("TestRoutine/" + goal.toString(), mGoalMap.get(goal));
     }
+  }
+
+  @Override
+  public boolean isFinished() {
+    goalsDone = true;
+    for (boolean value : mGoalMap.values()) {
+      if (!value) {
+        goalsDone = false;
+        break;
+      }
+    }
+    return goalsDone && swerveChecked;
+  }
 }

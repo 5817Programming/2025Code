@@ -10,11 +10,12 @@ import com.team5817.frc2025.autos.Actions.SequentialAction;
 import com.team5817.frc2025.autos.Actions.TrajectoryAction;
 import com.team5817.frc2025.autos.Actions.WaitAction;
 import com.team5817.frc2025.autos.Actions.WaitToPassDistanceToReef;
-import com.team5817.frc2025.autos.AutoModeSelector.StartingPosition;
+import com.team5817.frc2025.autos.AutoModeFactory.StartingPosition;
 import com.team5817.frc2025.autos.Actions.WaitForSuperstructureAction;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
+import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.lib.RobotMode;
 import com.team5817.lib.motion.Trajectory;
 import com.team5817.lib.motion.TrajectorySet;
@@ -27,7 +28,8 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class Center11 extends AutoBase {
 
-  private Superstructure s = Superstructure.getInstance();
+  private Superstructure s;
+  private Drive d;
   private TrajectorySet t;
 
   /**
@@ -40,8 +42,9 @@ public class Center11 extends AutoBase {
    * @param secondScore      the second scoring location
    * @param thirdScore       the third scoring location
    */
-  public Center11(StartingPosition startingPosition) {
-
+  public Center11(StartingPosition startingPosition, Superstructure s, Drive d) {
+    this.d = d;
+    this.s = s;
     boolean mirror = startingPosition.mirrored;
     Trajectory coral;
     Trajectory backup;
@@ -72,11 +75,11 @@ public class Center11 extends AutoBase {
   @Override
   public void routine() {
     if (RobotMode.isSim()) {
-      mSim.setSimulationWorldPose(t.initalPose().wpi());
+      d.setPose(t.initalPose());
     }
     s.setReadyToScore(false);
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), AutoConstants.scoreTimeout),
+        new TrajectoryAction(t.next(), AutoConstants.scoreTimeout, d),
         new LambdaAction(() -> {
           s.setGoal(GoalState.L4);
         }))));
@@ -84,29 +87,29 @@ public class Center11 extends AutoBase {
     System.out.println("Starting Score of 3A at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
 
-    r(new WaitForSuperstructureAction());
+    r(new WaitForSuperstructureAction(s));
     r(new WaitAction(AutoConstants.coralSpit));
 
     System.out.println("Scored 3A at " + (Timer.getTimestamp() - startTime));
 
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), 0.4),
-        new SequentialAction(new WaitToPassDistanceToReef(AutoConstants.exitDistance),
+        new TrajectoryAction(t.next(), 0.4, d),
+        new SequentialAction(new WaitToPassDistanceToReef(AutoConstants.exitDistance, d),
             new LambdaAction(() -> {
               s.setGoal(GoalState.A1);
             })))));
     s.setReadyToScore(false);
-    r(new WaitForSuperstructureAction());
+    r(new WaitForSuperstructureAction(s));
     System.out.println("Dealgaefing at " + (Timer.getTimestamp() - startTime));
-    r(new TrajectoryAction(t.next(), .5));
+    r(new TrajectoryAction(t.next(), .5, d));
     System.out.println("Waiting for entry at " + (Timer.getTimestamp() - startTime));
     r(new WaitAction(1));// intake wait
     s.setGoal(GoalState.A1);
     System.out.println("Dealgaefied at " + (Timer.getTimestamp() - startTime));
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next()),
+        new TrajectoryAction(t.next(), d),
         new SequentialAction(List.of(
-            new WaitToPassDistanceToReef(AutoConstants.exitDistance),
+            new WaitToPassDistanceToReef(AutoConstants.exitDistance, d),
             new LambdaAction(() -> {
               s.setGoal(GoalState.ASTOW);
               System.out.println("Stowed at " + (Timer.getTimestamp() - startTime));
@@ -119,6 +122,6 @@ public class Center11 extends AutoBase {
     r(new WaitAction(1));
     s.setGoal(GoalState.STOW);
     r(new WaitAction(1));
-    r(new TrajectoryAction(t.next()));
+    r(new TrajectoryAction(t.next(), d));
   }
 }

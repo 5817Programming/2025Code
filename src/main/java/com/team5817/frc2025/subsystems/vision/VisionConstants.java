@@ -1,8 +1,6 @@
-package com.team5817.frc2025.subsystems;
+package com.team5817.frc2025.subsystems.Vision;
 
 import java.util.List;
-
-import com.team5817.frc2025.subsystems.vision.VisionDeviceConstants;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;

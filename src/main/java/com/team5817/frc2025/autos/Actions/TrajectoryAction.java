@@ -6,70 +6,74 @@ import com.team5817.lib.motion.Trajectory;
 /**
  * TrajectoryAction is an action that sets a trajectory for the robot to follow.
  */
-public class TrajectoryAction implements Action{
+public class TrajectoryAction implements Action {
 
-	private Drive mDrive = null;
-	private Trajectory mTrajectory;
-	private double extraTimeout;
+  private Drive mDrive = null;
+  private Trajectory mTrajectory;
+  private double extraTimeout;
 
-	/**
-	 * Constructs a TrajectoryAction with the specified trajectory.
-	 *
-	 * @param path The trajectory to follow.
-	 */
-	public TrajectoryAction(Trajectory path){
-		this(path, false , Double.MAX_VALUE);
-	}
-	public TrajectoryAction(Trajectory path, boolean resetPos){
-		this(path,resetPos, Double.MAX_VALUE);
-	}
-	public TrajectoryAction(Trajectory path, double extraTimeout){
-		this(path,false,extraTimeout);
-	}
+  /**
+   * Constructs a TrajectoryAction with the specified trajectory.
+   *
+   * @param path The trajectory to follow.
+   */
+  public TrajectoryAction(Trajectory path, Drive drive) {
+    this(path, false, Double.MAX_VALUE, drive);
+  }
 
-	/**
-	 * Constructs a TrajectoryAction with the specified trajectory and reset position flag.
-	 *
-	 * @param path The trajectory to follow.
-	 * @param resetPos Whether to reset the robot's position.
-	 */
-	public TrajectoryAction(Trajectory path, boolean resetPos,double extraTimeout){
-		this.mTrajectory = path;
-		this.mDrive = Drive.getInstance();
-		this.extraTimeout = extraTimeout;
-	}
+  public TrajectoryAction(Trajectory path, boolean resetPos, Drive drive) {
+    this(path, resetPos, Double.MAX_VALUE, drive);
+  }
 
-	/**
-	 * Starts the action by setting the trajectory in the drive subsystem.
-	 */
-	@Override
-	public void start(){
-		mDrive.setTrajectory(mTrajectory,extraTimeout+mTrajectory.get().trajectory().getTotalTimeSeconds());
-	}
+  public TrajectoryAction(Trajectory path, double extraTimeout, Drive drive) {
+    this(path, false, extraTimeout, drive);
+  }
 
-	/**
-	 * Checks if the trajectory is finished.
-	 *
-	 * @return true if the trajectory is finished, false otherwise.
-	 */
-	@Override
-	public boolean isFinished() {
-		// return false;
-		return mDrive.isTrajectoryFinished();
-	}
+  /**
+   * Constructs a TrajectoryAction with the specified trajectory and reset
+   * position flag.
+   *
+   * @param path     The trajectory to follow.
+   * @param resetPos Whether to reset the robot's position.
+   */
+  public TrajectoryAction(Trajectory path, boolean resetPos, double extraTimeout, Drive drive) {
+    this.mTrajectory = path;
+    this.mDrive = drive;
+    this.extraTimeout = extraTimeout;
+  }
 
-	/**
-	 * Updates the action. This method is called periodically while the action is running.
-	 */
-	@Override
-	public void update() {
-	}
+  /**
+   * Starts the action by setting the trajectory in the drive subsystem.
+   */
+  @Override
+  public void start() {
+    mDrive.setTrajectory(mTrajectory, extraTimeout + mTrajectory.get().trajectory().getTotalTimeSeconds());
+  }
 
-	/**
-	 * Called once when the action is finished.
-	 */
-	@Override
-	public void done() {
-		System.out.println("Segement Complete");
-	}
+  /**
+   * Checks if the trajectory is finished.
+   *
+   * @return true if the trajectory is finished, false otherwise.
+   */
+  @Override
+  public boolean isFinished() {
+    // return false;
+    return mDrive.isTrajectoryFinished();
+  }
+
+  /**
+   * Updates the action. This method is called periodically while the action is
+   * running.
+   */
+  @Override
+  public void update() {
+  }
+
+  /**
+   * Called once when the action is finished.
+   */
+  @Override
+  public void done() {
+    System.out.println("Segement Complete");
+  }
 }

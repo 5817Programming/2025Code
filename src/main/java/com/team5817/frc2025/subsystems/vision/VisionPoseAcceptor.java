@@ -1,4 +1,4 @@
-package com.team5817.frc2025.subsystems.vision;
+package com.team5817.frc2025.subsystems.Vision;
 
 import org.littletonrobotics.junction.Logger;
 

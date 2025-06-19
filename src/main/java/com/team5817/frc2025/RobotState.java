@@ -16,7 +16,7 @@ import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.MovingAverageTwist2d;
-import com.team5817.frc2025.subsystems.vision.VisionPoseAcceptor;
+import com.team5817.frc2025.subsystems.Vision.VisionPoseAcceptor;
 import com.team5817.lib.util.UnscentedKalmanFilter;
 
 /**

@@ -19,73 +19,76 @@ import com.team5817.frc2025.loops.ILooper;
  */
 public abstract class Subsystem {
 
-	/**
-	 * Writes data to the log.
-	 */
-	public void writeToLog() {
-	}
+  /**
+   * Writes data to the log.
+   */
+  public void writeToLog() {
+  }
 
-	/**
-	 * Reads periodic inputs. This is an optional design pattern for caching periodic reads to avoid hammering the HAL/CAN.
-	 */
-	public void readPeriodicInputs() {
-	}
+  /**
+   * Reads periodic inputs. This is an optional design pattern for caching
+   * periodic reads to avoid hammering the HAL/CAN.
+   */
+  public void readPeriodicInputs() {
+  }
 
-	/**
-	 * Writes periodic outputs. This is an optional design pattern for caching periodic writes to avoid hammering the HAL/CAN.
-	 */
-	public void writePeriodicOutputs() {
-	}
+  /**
+   * Writes periodic outputs. This is an optional design pattern for caching
+   * periodic writes to avoid hammering the HAL/CAN.
+   */
+  public void writePeriodicOutputs() {
+  }
 
-	/**
-	 * Stops the subsystem.
-	 */
-	public void stop() {
-	}
+  /**
+   * Stops the subsystem.
+   */
+  public void stop() {
+  }
 
-	/**
-	 * Zeros all sensors, which helps with calibration.
-	 */
-	public void zeroSensors() {
-	}
+  /**
+   * Zeros all sensors, which helps with calibration.
+   */
+  public void zeroSensors() {
+  }
 
-	/**
-	 * Outputs telemetry data.
-	 */
-	public void outputTelemetry() {
-	}
+  /**
+   * Outputs telemetry data.
+   */
+  public void outputTelemetry() {
+  }
 
-	/**
-	 * Registers enabled loops with the subsystem.
-	 * 
-	 * @param enabledLooper the looper to register
-	 */
-	public void registerEnabledLoops(ILooper enabledLooper) {
-	}
+  /**
+   * Registers enabled loops with the subsystem.
+   * 
+   * @param enabledLooper the looper to register
+   */
+  public void registerEnabledLoops(ILooper enabledLooper) {
+  }
 
-	/**
-	 * Checks the system for any issues.
-	 * 
-	 * @return true if the system is healthy, false otherwise
-	 */
-	public boolean checkSystem() {
-		return false;
-	}
+  /**
+   * Checks the system for any issues.
+   * 
+   * @return true if the system is healthy, false otherwise
+   */
+  public boolean checkSystem() {
+    return false;
+  }
 
-	public boolean hasEmergency = false;
+  public boolean hasEmergency = false;
 
-	/**
-	 * Checks if attached devices have healthy configurations. This is an optional pattern.
-	 * 
-	 * @return true if the device configurations are healthy, false otherwise
-	 */
-	public boolean checkDeviceConfiguration() {
-		return true;
-	}
+  /**
+   * Checks if attached devices have healthy configurations. This is an optional
+   * pattern.
+   * 
+   * @return true if the device configurations are healthy, false otherwise
+   */
+  public boolean checkDeviceConfiguration() {
+    return true;
+  }
 
-	/**
-	 * Rewrites the configuration of attached devices. This is an optional pattern.
-	 */
-	public void rewriteDeviceConfiguration() {
-	}
+  /**
+   * Rewrites the configuration of attached devices. This is an optional pattern.
+   */
+  public void rewriteDeviceConfiguration() {
+  }
 }

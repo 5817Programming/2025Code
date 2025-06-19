@@ -1,18 +1,25 @@
-package com.team5817.frc2025.subsystems.vision;
+package com.team5817.frc2025.subsystems.Vision;
+
+import com.team254.lib.geometry.Pose2d;
 
 /**
  * Represents a frame of vision data with a timestamp.
  */
 public class VisionFrame {
-	double timestamp;
-	double[] frame_data;
-
-	/**
-	 * Gets the timestamp of the vision frame.
-	 *
-	 * @return the timestamp of the vision frame
-	 */
-	public double getTimestamp() {
-		return timestamp;
+	public final String cameraName;
+	public final double timestamp;
+	public final Pose2d estimatedPose;
+	public final int tagId;
+	public final double tx;
+	public final double ty;
+  
+	public VisionFrame(String cameraName, double timestamp, Pose2d estimatedPose, int tagId, double tx, double ty) {
+	  this.cameraName = cameraName;
+	  this.timestamp = timestamp;
+	  this.estimatedPose = estimatedPose;
+	  this.tagId = tagId;
+	  this.tx = tx;
+	  this.ty = ty;
 	}
-}
+  }
+  

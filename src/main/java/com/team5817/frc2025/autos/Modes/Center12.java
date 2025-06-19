@@ -10,10 +10,11 @@ import com.team5817.frc2025.autos.Actions.SequentialAction;
 import com.team5817.frc2025.autos.Actions.TrajectoryAction;
 import com.team5817.frc2025.autos.Actions.WaitAction;
 import com.team5817.frc2025.autos.Actions.WaitToPassDistanceToReef;
-import com.team5817.frc2025.autos.AutoModeSelector.StartingPosition;
+import com.team5817.frc2025.autos.AutoModeFactory.StartingPosition;
 import com.team5817.frc2025.autos.Actions.WaitForSuperstructureAction;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.subsystems.Superstructure;
+import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
 import com.team5817.lib.RobotMode;
 import com.team5817.lib.motion.Trajectory;
@@ -26,8 +27,8 @@ import edu.wpi.first.wpilibj.Timer;
  * actions.
  */
 public class Center12 extends AutoBase {
-
-  private Superstructure s = Superstructure.getInstance();
+  private Drive d;
+  private Superstructure s;
   private TrajectorySet t;
 
   /**
@@ -40,8 +41,10 @@ public class Center12 extends AutoBase {
    * @param secondScore      the second scoring location
    * @param thirdScore       the third scoring location
    */
-  public Center12(StartingPosition startingPosition) {
+  public Center12(StartingPosition startingPosition, Superstructure s, Drive d) {
 
+    this.d = d;
+    this.s = s;
     boolean mirror = startingPosition.mirrored;
     Trajectory c1;
     Trajectory clear1;
@@ -73,11 +76,11 @@ public class Center12 extends AutoBase {
   @Override
   public void routine() {
     if (RobotMode.isSim()) {
-      mSim.setSimulationWorldPose(t.initalPose().wpi());
+      d.setPose(t.initalPose());
     }
     s.setReadyToScore(false);
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), 2),
+        new TrajectoryAction(t.next(), 2, d),
         new LambdaAction(() -> {
           s.setGoal(GoalState.L4);
         }))));
@@ -85,23 +88,23 @@ public class Center12 extends AutoBase {
     System.out.println("Auto:Starting Score of 3A at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
 
-    r(new WaitForSuperstructureAction());
+    r(new WaitForSuperstructureAction(s));
     r(new WaitAction(AutoConstants.coralSpit));
 
     System.out.println("Auto:Scored 3A at " + (Timer.getTimestamp() - startTime));
 
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), 0.4),
-        new SequentialAction(new WaitToPassDistanceToReef(AutoConstants.exitDistance),
+        new TrajectoryAction(t.next(), 0.4, d),
+        new SequentialAction(new WaitToPassDistanceToReef(AutoConstants.exitDistance, d),
             new LambdaAction(() -> {
               s.setGoal(GoalState.A1);
             })))));
-    r(new TrajectoryAction(t.next(), 1));
+    r(new TrajectoryAction(t.next(), 1, d));
     System.out.println("Auto:Dealgaefied 6 at " + (Timer.getTimestamp() - startTime));
     scoreNet();
     System.out.println("Auto:Scored first net at " + (Timer.getTimestamp() - startTime));
     s.setGoal(GoalState.A2);
-    r(new TrajectoryAction(t.next(), .5));
+    r(new TrajectoryAction(t.next(), .5, d));
     System.out.println("Auto:Dealgaefied 5 at " + (Timer.getTimestamp() - startTime));
     scoreNet();
     System.out.println("Auto:Scored second net at " + (Timer.getTimestamp() - startTime));
@@ -111,9 +114,9 @@ public class Center12 extends AutoBase {
   public void scoreNet() {
     s.setReadyToScore(false);
     r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next()),
+        new TrajectoryAction(t.next(), d),
         new SequentialAction(List.of(
-            new WaitToPassDistanceToReef(AutoConstants.exitDistance),
+            new WaitToPassDistanceToReef(AutoConstants.exitDistance, d),
             new LambdaAction(() -> {
               s.setGoal(GoalState.SUPER_NET);
               System.out.println("Auto:Raising at " + (Timer.getTimestamp() - startTime));
