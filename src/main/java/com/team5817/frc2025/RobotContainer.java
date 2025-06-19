@@ -10,15 +10,15 @@ import com.team5817.frc2025.subsystems.EndEffector.EndEffectorConstants.EndEffec
 import com.team5817.frc2025.subsystems.EndEffector.EndEffectorWrist;
 import com.team5817.frc2025.subsystems.Intake.Intake;
 import com.team5817.frc2025.subsystems.Intake.IntakeConstants;
-import com.team5817.frc2025.subsystems.Vision.VisionDevice;
-import com.team5817.frc2025.subsystems.Vision.VisionDeviceIO;
-import com.team5817.frc2025.subsystems.Vision.VisionDeviceIOLimelight;
-import com.team5817.frc2025.subsystems.Vision.VisionDeviceIOSim;
 import com.team5817.frc2025.subsystems.Rollers.RollerSubsystem;
 import com.team5817.frc2025.subsystems.Rollers.RollerSubsystemIO;
 import com.team5817.frc2025.subsystems.Rollers.RollerSubsystemIOSim;
 import com.team5817.frc2025.subsystems.Rollers.RollerSubsystemIOTalonFX;
-import com.team5817.frc2025.subsystems.Vision.VisionDeviceManager;
+import com.team5817.frc2025.subsystems.Vision.Vision;
+import com.team5817.frc2025.subsystems.Vision.VisionConstants;
+import com.team5817.frc2025.subsystems.Vision.VisionIO;
+import com.team5817.frc2025.subsystems.Vision.VisionIOLimelight;
+import com.team5817.frc2025.subsystems.Vision.VisionIOPhotonVisionSim;
 import com.team5817.lib.RobotMode;
 import com.team5817.lib.drivers.ServoMotorIO;
 import com.team5817.lib.drivers.ServoMotorIOSim;
@@ -37,7 +37,7 @@ public class RobotContainer {
   public EndEffectorWrist mEndEffectorWrist;
   public RollerSubsystem<EndEffectorConstants.RollerState> mEndEffectorRollers;
   public Intake mIntake;
-  public VisionDeviceManager mVision;
+  public Vision mVision;
   public Superstructure mSuperstructure;
 
   public RobotContainer() {
@@ -96,14 +96,13 @@ public class RobotContainer {
         new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
     mElevator = new Elevator(
         new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
-    mVision = new VisionDeviceManager(
-      new VisionDevice("limelight-right", new VisionDeviceIOLimelight("limelight-right", mDrive)),
-      new VisionDevice("limelight-left", new VisionDeviceIOLimelight("limelight-left", mDrive)),
-      new VisionDevice("limelight-up", new VisionDeviceIOLimelight("limelight-up", mDrive))
+    mVision = new Vision(
+      mDrive::addVisionMeasurement, 
+      new VisionIOLimelight("limelight-up", mDrive::getHeading),
+      new VisionIOLimelight("limelight-left", mDrive::getHeading),
+      new VisionIOLimelight("limelight-right", mDrive::getHeading)
     );
     
-
-  
     mDrive = new Drive(
       new GyroIOPigeon2(),
       new ModuleIOTalonFX(TunerConstants.FrontLeft),
@@ -129,19 +128,20 @@ public class RobotContainer {
         new ServoMotorIOSim(IntakeConstants.DeployConstants.kDeployServoConstants));
     mElevator = new Elevator(
         new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants));
-
-        mVision = new VisionDeviceManager(
-          new VisionDeviceIO() {},
-          new VisionDeviceIO() {},
-          new VisionDeviceIO() {}
-        );
    
-        mDrive = new Drive(
+    mDrive = new Drive(
       new GyroIO() {},
       new ModuleIOSim(TunerConstants.FrontLeft),
       new ModuleIOSim(TunerConstants.FrontRight),
       new ModuleIOSim(TunerConstants.BackLeft),
       new ModuleIOSim(TunerConstants.BackRight)
+    );
+
+    mVision = new Vision(
+      mDrive::addVisionMeasurement, 
+      new VisionIOPhotonVisionSim("limelight-up",VisionConstants.robotToCameraUp,mDrive::getPose),
+      new VisionIOPhotonVisionSim("limelight-right",VisionConstants.robotToCameraLeft,mDrive::getPose),
+      new VisionIOPhotonVisionSim("limelight-left",VisionConstants.robotToCameraRight,mDrive::getPose)
     );
   }
   public void makeEmptyRobot(){
@@ -166,10 +166,11 @@ public class RobotContainer {
       new ModuleIO() {}
     );
 
-  mVision = new VisionDeviceManager(
-  new VisionDeviceIO() {},
-  new VisionDeviceIO() {},
-  new VisionDeviceIO() {}
-);
+    mVision = new Vision(
+      mDrive::addVisionMeasurement, 
+      new VisionIO() {},
+      new VisionIO() {},
+      new VisionIO() {}
+    );
   }
 }

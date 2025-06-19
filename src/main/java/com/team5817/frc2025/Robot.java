@@ -70,8 +70,6 @@ public class Robot extends LoggedRobot {
 
     DriverStation.startDataLog(DataLogManager.getLog());
 
-    RobotState.getInstance().reset();
-
     Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
 

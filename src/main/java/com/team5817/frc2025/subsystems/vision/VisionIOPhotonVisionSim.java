@@ -1,75 +1,49 @@
-// package com.team5817.frc2025.subsystems.Vision;
+package com.team5817.frc2025.subsystems.Vision;
 
-// import static com.team5817.frc2025.field.FieldLayout.kTagMap;
+import static com.team5817.frc2025.subsystems.Vision.VisionConstants.aprilTagLayout;
 
-// import com.team5817.frc2025.subsystems.Vision.VisionDevice;
-// import com.team5817.frc2025.subsystems.Vision.VisionDeviceIO;
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.geometry.Transform3d;
-// import org.photonvision.simulation.PhotonCameraSim;
-// import org.photonvision.simulation.SimCameraProperties;
-// import org.photonvision.simulation.VisionSystemSim;
+import edu.wpi.first.math.geometry.Transform3d;
+import java.util.function.Supplier;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 
-// import java.util.function.Supplier;
+import com.team254.lib.geometry.Pose2d;
 
-// /** IO implementation for physics sim using PhotonVision simulator. */
-// public class VisionIOPhotonVisionSim implements VisionDeviceIO {
-  
-//   private static VisionSystemSim visionSim;
-  
-//   private final Supplier<Pose2d> poseSupplier;
-//   private final PhotonCameraSim cameraSim;
+/** IO implementation for physics sim using PhotonVision simulator. */
+public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
+  private static VisionSystemSim visionSim;
 
-//   /**
-//    * Creates a new VisionIOPhotonVisionSim.
-//    *
-//    * @param name The name of the camera.
-//    * @param robotToCamera The transform from the robot to the camera.
-//    * @param poseSupplier Supplier for the robot pose to use in simulation.
-//    */
-//   public VisionIOPhotonVisionSim(String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
-//     this.poseSupplier = poseSupplier;
+  private final Supplier<Pose2d> poseSupplier;
+  private final PhotonCameraSim cameraSim;
 
-//     // Initialize vision sim
-//     if (visionSim == null) {
-//       visionSim = new VisionSystemSim("main");
-//       visionSim.addAprilTags(kTagMap); // Using your `kTagMap` for AprilTags
-//     }
+  /**
+   * Creates a new VisionIOPhotonVisionSim.
+   *
+   * @param name The name of the camera.
+   * @param poseSupplier Supplier for the robot pose to use in simulation.
+   */
+  public VisionIOPhotonVisionSim(
+      String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
+    super(name, robotToCamera);
+    this.poseSupplier = poseSupplier;
 
-//     // Add sim camera
-//     SimCameraProperties cameraProperties = new SimCameraProperties();
-//     cameraSim = new PhotonCameraSim(name, cameraProperties, kTagMap);
-//     visionSim.addCamera(cameraSim, robotToCamera);
-//   }
+    // Initialize vision sim
+    if (visionSim == null) {
+      visionSim = new VisionSystemSim("main");
+      visionSim.addAprilTags(aprilTagLayout);
+    }
 
-//   /**
-//    * Updates the VisionIOInputs based on the simulation.
-//    *
-//    * @param inputs The VisionIOInputs instance to update.
-//    */
-//   @Override
-//   public void updateInputs(VisionIOInputs inputs) {
-//     // Update vision sim with the current robot pose
-//     visionSim.update(poseSupplier.get());
-
-//     // Fetch the latest camera result
-//     var result = cameraSim.getLatestResult();
+    // Add sim camera
+    var cameraProperties = new SimCameraProperties();
+    cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
+    visionSim.addCamera(cameraSim, robotToCamera);
     
-//     if (result.hasTargets()) {
-//       var best = result.getBestTarget();
+  }
 
-//       result.getMultiTagResult().estimatedPose.ifPresent(estimated -> {
-//         VisionFrame frame = new VisionFrame(
-//           name,
-//           estimated.getTimestampSeconds(),
-//           estimated.getPose().toPose2d(),
-//           best.getFiducialId(),
-//           best.getYaw(),
-//           best.getPitch()
-//         );
-
-//         VisionDeviceManager.addVisionFrame(frame);
-//       });
-//     }
-//   }
-// }
+  @Override
+  public void updateInputs(VisionIOInputs inputs) {
+    visionSim.update(poseSupplier.get().wpi());
+    super.updateInputs(inputs);
+  }
+}
