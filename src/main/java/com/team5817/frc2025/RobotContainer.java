@@ -1,8 +1,10 @@
 package com.team5817.frc2025;
 
+import com.team254.lib.util.SynchronousPIDF;
 import com.team5817.frc2025.generated.TunerConstants;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Drive.Drive;
+import com.team5817.frc2025.subsystems.Drive.SwerveConstants;
 import com.team5817.frc2025.subsystems.Elevator.Elevator;
 import com.team5817.frc2025.subsystems.Elevator.ElevatorConstants;
 import com.team5817.frc2025.subsystems.EndEffector.EndEffectorConstants;
@@ -49,12 +51,12 @@ public class RobotContainer {
         makeEmptyRobot();
         break;
       case SIM:
-      makeSimulatedRobot();
+        makeSimulatedRobot();
         break;
       default:
-      makeEmptyRobot();
+        makeEmptyRobot();
         break;
-      
+
     }
 
     SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
@@ -97,19 +99,19 @@ public class RobotContainer {
     mElevator = new Elevator(
         new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
     mVision = new Vision(
-      mDrive::addVisionMeasurement, 
-      new VisionIOLimelight("limelight-up", mDrive::getHeading),
-      new VisionIOLimelight("limelight-left", mDrive::getHeading),
-      new VisionIOLimelight("limelight-right", mDrive::getHeading)
-    );
-    
+        mDrive::addVisionMeasurement,
+        new VisionIOLimelight("limelight-up", mDrive::getHeading),
+        new VisionIOLimelight("limelight-left", mDrive::getHeading),
+        new VisionIOLimelight("limelight-right", mDrive::getHeading));
+
     mDrive = new Drive(
-      new GyroIOPigeon2(),
-      new ModuleIOTalonFX(TunerConstants.FrontLeft),
-      new ModuleIOTalonFX(TunerConstants.FrontRight),
-      new ModuleIOTalonFX(TunerConstants.BackLeft),
-      new ModuleIOTalonFX(TunerConstants.BackRight)
-    );
+        new GyroIOPigeon2(),
+        new ModuleIOTalonFX(TunerConstants.FrontLeft),
+        new ModuleIOTalonFX(TunerConstants.FrontRight),
+        new ModuleIOTalonFX(TunerConstants.BackLeft),
+        new ModuleIOTalonFX(TunerConstants.BackRight),
+        SwerveConstants.stabilizePID,
+        SwerveConstants.snapPID);
 
   }
 
@@ -128,49 +130,66 @@ public class RobotContainer {
         new ServoMotorIOSim(IntakeConstants.DeployConstants.kDeployServoConstants));
     mElevator = new Elevator(
         new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants));
-   
+
     mDrive = new Drive(
-      new GyroIO() {},
-      new ModuleIOSim(TunerConstants.FrontLeft),
-      new ModuleIOSim(TunerConstants.FrontRight),
-      new ModuleIOSim(TunerConstants.BackLeft),
-      new ModuleIOSim(TunerConstants.BackRight)
-    );
+        new GyroIO() {
+        },
+        new ModuleIOSim(TunerConstants.FrontLeft),
+        new ModuleIOSim(TunerConstants.FrontRight),
+        new ModuleIOSim(TunerConstants.BackLeft),
+        new ModuleIOSim(TunerConstants.BackRight),
+        SwerveConstants.simStabilizePID,
+        SwerveConstants.simSnapPID);
 
     mVision = new Vision(
-      mDrive::addVisionMeasurement, 
-      new VisionIOPhotonVisionSim("limelight-up",VisionConstants.robotToCameraUp,mDrive::getPose),
-      new VisionIOPhotonVisionSim("limelight-right",VisionConstants.robotToCameraLeft,mDrive::getPose),
-      new VisionIOPhotonVisionSim("limelight-left",VisionConstants.robotToCameraRight,mDrive::getPose)
-    );
+        mDrive::addVisionMeasurement,
+        new VisionIOPhotonVisionSim("limelight-up", VisionConstants.robotToCameraUp, mDrive::getPose),
+        new VisionIOPhotonVisionSim("limelight-right", VisionConstants.robotToCameraLeft, mDrive::getPose),
+        new VisionIOPhotonVisionSim("limelight-left", VisionConstants.robotToCameraRight, mDrive::getPose));
   }
-  public void makeEmptyRobot(){
+
+  public void makeEmptyRobot() {
     mEndEffectorWrist = new EndEffectorWrist(
-        new ServoMotorIO(){});
+        new ServoMotorIO() {
+        });
     mEndEffectorRollers = new RollerSubsystem<EndEffectorConstants.RollerState>(
         EndEffectorConstants.RollerState.IDLE,
         "EndEffectorRollers",
-        new RollerSubsystemIO(){});
+        new RollerSubsystemIO() {
+        });
 
     mIntake = new Intake(
-        new RollerSubsystemIO(){},
-        new RollerSubsystemIO(){},
-        new RollerSubsystemIO(){},
-        new ServoMotorIO(){});
-    mElevator = new Elevator(new ServoMotorIO(){});
+        new RollerSubsystemIO() {
+        },
+        new RollerSubsystemIO() {
+        },
+        new RollerSubsystemIO() {
+        },
+        new ServoMotorIO() {
+        });
+    mElevator = new Elevator(new ServoMotorIO() {
+    });
     mDrive = new Drive(
-      new GyroIO() {},
-      new ModuleIO() {},
-      new ModuleIO() {},
-      new ModuleIO() {},
-      new ModuleIO() {}
-    );
+        new GyroIO() {
+        },
+        new ModuleIO() {
+        },
+        new ModuleIO() {
+        },
+        new ModuleIO() {
+        },
+        new ModuleIO() {
+        },
+        new SynchronousPIDF(),
+        new SynchronousPIDF());
 
     mVision = new Vision(
-      mDrive::addVisionMeasurement, 
-      new VisionIO() {},
-      new VisionIO() {},
-      new VisionIO() {}
-    );
+        mDrive::addVisionMeasurement,
+        new VisionIO() {
+        },
+        new VisionIO() {
+        },
+        new VisionIO() {
+        });
   }
 }

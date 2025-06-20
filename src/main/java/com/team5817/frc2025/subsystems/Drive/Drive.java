@@ -28,6 +28,7 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.swerve.ChassisSpeeds;
+import com.team254.lib.util.SynchronousPIDF;
 import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.generated.TunerConstants;
 import com.team5817.lib.RobotMode;
@@ -100,24 +101,28 @@ public class Drive extends Subsystem {
     PATH_FOLLOWING,
     AUTOALIGN
   }
+
   private DriveControlState mControlState = DriveControlState.OPEN_LOOP;
   private boolean mControlStateHasChanged = false;
 
   private double alignmentStartTimestamp = 0;
 
-    private final DriveMotionPlanner mMotionPlanner;
+  private final DriveMotionPlanner mMotionPlanner;
   private final AutoAlignMotionPlanner mAutoAlignMotionPlanner;
 
   private final SwerveHeadingController mHeadingController;
-  @Setter @Accessors(prefix = "m") private Rotation2d mTrackingAngle = Rotation2d.identity();
-  @Setter @Accessors(prefix = "m") private boolean mOverrideHeading = false;
+  @Setter
+  @Accessors(prefix = "m")
+  private Rotation2d mTrackingAngle = Rotation2d.identity();
+  @Setter
+  @Accessors(prefix = "m")
+  private boolean mOverrideHeading = false;
 
-  @Setter @Accessors(prefix = "m") private static AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
-  @Setter private boolean autoAlignFinishedOverrride = false;
-
-
-
-
+  @Setter
+  @Accessors(prefix = "m")
+  private static AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
+  @Setter
+  private boolean autoAlignFinishedOverrride = false;
 
   public static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -144,15 +149,17 @@ public class Drive extends Subsystem {
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO,
+      SynchronousPIDF stabilizePID,
+      SynchronousPIDF snapPID) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
     modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
     mMotionPlanner = new DriveMotionPlanner();
-    mAutoAlignMotionPlanner = new AutoAlignMotionPlanner();
-    mHeadingController = new SwerveHeadingController();
+    mHeadingController = new SwerveHeadingController(snapPID, stabilizePID);
+    mAutoAlignMotionPlanner = new AutoAlignMotionPlanner(mHeadingController);
 
     mAutoAlignMotionPlanner.reset();
 
@@ -173,7 +180,7 @@ public class Drive extends Subsystem {
     // (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-    /**
+  /**
    * Sets the control state of the drive system.
    *
    * @param newState The new control state to set.
@@ -185,9 +192,10 @@ public class Drive extends Subsystem {
     }
   }
 
-  public void feedTeleopSetpoint(ChassisSpeeds speeds){
+  public void feedTeleopSetpoint(ChassisSpeeds speeds) {
     runVelocity(getTeleopSetpoint(speeds));
   }
+
   private ChassisSpeeds getTeleopSetpoint(ChassisSpeeds speeds) {
 
     double omega = mHeadingController.update(getHeading(), Timer.getTimestamp());
@@ -217,7 +225,7 @@ public class Drive extends Subsystem {
       } else {
         ChassisSpeeds speed = mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(),
             getPose()
-              .withRotation(getHeading()));
+                .withRotation(getHeading()));
         if (speed != null) {
           return speed;
         }
@@ -252,7 +260,8 @@ public class Drive extends Subsystem {
     setAlignment(type);
     alignDrive(findTargetPoint());
   }
-   /**
+
+  /**
    * Initiates auto alignment with the specified alignment type.
    *
    * @param type The alignment type.
@@ -272,6 +281,7 @@ public class Drive extends Subsystem {
       setControlState(DriveControlState.AUTOALIGN);
     }
   }
+
   /**
    * Sets the trajectory for the motion planner.
    *
@@ -306,6 +316,7 @@ public class Drive extends Subsystem {
             .withRotation(getHeading()));
     return mAutoAlignMotionPlanner.getAutoAlignError();
   }
+
   /**
    * Updates the path follower.
    */
@@ -326,12 +337,11 @@ public class Drive extends Subsystem {
     return mMotionPlanner.isPathFinished();
   }
 
-
   @Override
   public void readPeriodicInputs() {
-    if(mControlState == DriveControlState.PATH_FOLLOWING)
+    if (mControlState == DriveControlState.PATH_FOLLOWING)
       updatePathFollower();
-  
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);

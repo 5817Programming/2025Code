@@ -2,22 +2,13 @@ package com.team5817.lib.swerve;
 
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.SynchronousPIDF;
-import com.team5817.frc2025.subsystems.Drive.SwerveConstants;
-import com.team5817.lib.RobotMode;
 
 import edu.wpi.first.wpilibj.Timer;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class SwerveHeadingController {
-  private static SwerveHeadingController mInstance;
-
-  public static SwerveHeadingController getInstance() {
-    if (mInstance == null) {
-      mInstance = new SwerveHeadingController();
-    }
-
-    return mInstance;
-  }
-
   public Rotation2d targetHeadingRadians;
   private double lastUpdatedTimestamp;
 
@@ -27,15 +18,10 @@ public class SwerveHeadingController {
     STABILIZE
   }
 
-  private State current_state = State.OFF;
-
-  public State getState() {
-    return current_state;
-  }
-
-  public void setState(State state) {
-    current_state = state;
-  }
+  @Getter
+  @Setter
+  @Accessors(prefix = "m")
+  private State mState = State.OFF;
 
   public void disable() {
     setState(State.OFF);
@@ -58,32 +44,9 @@ public class SwerveHeadingController {
     return targetHeadingRadians;
   }
 
-  public SwerveHeadingController() {
-    stabilizePID = new SynchronousPIDF(
-        SwerveConstants.kStabilizeSwerveHeadingKp,
-        SwerveConstants.kStabilizeSwerveHeadingKi,
-        SwerveConstants.kStabilizeSwerveHeadingKd,
-        SwerveConstants.kStabilizeSwerveHeadingKf);
-
-    snapPID = new SynchronousPIDF(
-        SwerveConstants.kSnapSwerveHeadingKp,
-        SwerveConstants.kSnapSwerveHeadingKi,
-        SwerveConstants.kSnapSwerveHeadingKd,
-        SwerveConstants.kSnapSwerveHeadingKf);
-
-    if (RobotMode.isSim()) {
-      stabilizePID.setPIDF(
-          SwerveConstants.kStabilizeSwerveHeadingKp * 2,
-          SwerveConstants.kStabilizeSwerveHeadingKi * 2,
-          SwerveConstants.kStabilizeSwerveHeadingKd * 2,
-          SwerveConstants.kStabilizeSwerveHeadingKf * 2);
-
-      snapPID.setPIDF(
-          SwerveConstants.kSnapSwerveHeadingKp * 2,
-          SwerveConstants.kSnapSwerveHeadingKi * 2,
-          SwerveConstants.kSnapSwerveHeadingKd * 2,
-          SwerveConstants.kSnapSwerveHeadingKf * 2);
-    }
+  public SwerveHeadingController(SynchronousPIDF stabilizePID, SynchronousPIDF snapPID) {
+    this.stabilizePID = stabilizePID;
+    this.snapPID = snapPID;
 
     stabilizePID.setInputRange(-Math.PI, Math.PI);
     stabilizePID.setContinuous();
@@ -96,13 +59,14 @@ public class SwerveHeadingController {
     snapPID.setOutputRange(-10 * Math.PI, 10 * Math.PI);
     targetHeadingRadians = Rotation2d.identity();
     lastUpdatedTimestamp = Timer.getFPGATimestamp();
+
   }
 
   public double update(Rotation2d heading, double timestamp) {
     double correction = 0;
     double error = heading.minus(targetHeadingRadians).getRadians();
     double dt = timestamp - lastUpdatedTimestamp;
-    switch (current_state) {
+    switch (mState) {
       case OFF:
         break;
       case STABILIZE:
