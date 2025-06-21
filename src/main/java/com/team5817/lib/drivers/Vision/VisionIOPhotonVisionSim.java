@@ -1,4 +1,4 @@
-package com.team5817.frc2025.subsystems.Vision;
+package com.team5817.lib.drivers.Vision;
 
 import static com.team5817.frc2025.subsystems.Vision.VisionConstants.aprilTagLayout;
 

@@ -5,9 +5,9 @@ import org.littletonrobotics.junction.Logger;
 import com.team5817.frc2025.RobotVisualizer;
 import com.team5817.frc2025.subsystems.EndEffector.EndEffectorConstants.EndEffectorWristConstants;
 import com.team5817.lib.Util;
-import com.team5817.lib.drivers.ServoMotorIO;
-import com.team5817.lib.drivers.ServoState;
-import com.team5817.lib.drivers.StateBasedServoMotorSubsystem;
+import com.team5817.lib.drivers.Servos.ServoMotorIO;
+import com.team5817.lib.drivers.Servos.ServoState;
+import com.team5817.lib.drivers.Servos.StateBasedServoMotorSubsystem;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import lombok.Getter;

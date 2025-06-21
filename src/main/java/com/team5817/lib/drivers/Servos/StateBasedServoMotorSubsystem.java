@@ -1,4 +1,4 @@
-package com.team5817.lib.drivers;
+package com.team5817.lib.drivers.Servos;
 
 import org.littletonrobotics.junction.Logger;
 

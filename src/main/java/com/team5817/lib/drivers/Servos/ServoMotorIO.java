@@ -1,9 +1,9 @@
-package com.team5817.lib.drivers;
+package com.team5817.lib.drivers.Servos;
 
 import org.littletonrobotics.junction.AutoLog;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.team5817.lib.drivers.ServoMotorSubsystem.ControlState;
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem.ControlState;
 
 public interface ServoMotorIO {
 

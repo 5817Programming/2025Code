@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.team5817.frc2025.autos.Actions.Action;
 import com.team5817.lib.PolynomialRegression;
-import com.team5817.lib.drivers.ServoMotorSubsystem;
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem;
 
 /**
  * Class for characterizing the feedforward gains of a subsystem.

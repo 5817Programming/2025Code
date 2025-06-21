@@ -1,9 +1,10 @@
-package com.team5817.lib.drivers;
+package com.team5817.lib.drivers.Servos;
 
 import com.team254.lib.drivers.CanDeviceId;
 import com.team254.lib.motion.MotionState;
 import com.team254.lib.util.DelayedBoolean;
 import com.team254.lib.util.Util;
+import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.requests.Request;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -27,7 +28,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
   }
 
   // Recommend initializing in a static block!
-  ServoConstants mConstants;
+  protected ServoConstants mConstants;
 
   @Setter
   @Accessors(prefix = "m")

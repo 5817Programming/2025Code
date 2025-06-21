@@ -3,7 +3,7 @@ package com.team5817.frc2025.autos.Modes;
 import com.team5817.frc2025.autos.AutoBase;
 import com.team5817.lib.diagnostic.FeedForwardCharacterization;
 import com.team5817.lib.diagnostic.FeedForwardCharacterization.FeedForwardCharacterizationData;
-import com.team5817.lib.drivers.ServoMotorSubsystem;
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem;
 
 public class Characterize extends AutoBase{
 

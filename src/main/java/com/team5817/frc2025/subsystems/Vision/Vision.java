@@ -14,8 +14,10 @@ import org.littletonrobotics.junction.Logger;
 
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
-import com.team5817.frc2025.subsystems.Vision.VisionIO.PoseObservationType;
 import com.team5817.lib.drivers.Subsystem;
+import com.team5817.lib.drivers.Vision.VisionIO;
+import com.team5817.lib.drivers.Vision.VisionIO.PoseObservationType;
+import com.team5817.lib.drivers.Vision.VisionIOInputsAutoLogged;
 
 import static com.team5817.frc2025.subsystems.Vision.VisionConstants.*;
 

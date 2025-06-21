@@ -3,9 +3,9 @@ package com.team5817.frc2025.subsystems.Intake;
 import com.team5817.frc2025.subsystems.Intake.IntakeConstants.RollerConstants.FeederState;
 import com.team5817.frc2025.subsystems.Intake.IntakeConstants.RollerConstants.LowIndexerState;
 import com.team5817.frc2025.subsystems.Intake.IntakeConstants.RollerConstants.SideIndexerState;
-import com.team5817.frc2025.subsystems.Rollers.RollerSubsystem;
-import com.team5817.frc2025.subsystems.Rollers.RollerSubsystemIO;
 import com.team5817.lib.drivers.Subsystem;
+import com.team5817.lib.drivers.Rollers.RollerSubsystem;
+import com.team5817.lib.drivers.Rollers.RollerSubsystemIO;
 import com.team5817.lib.requests.ParallelRequest;
 import com.team5817.lib.requests.Request;
 

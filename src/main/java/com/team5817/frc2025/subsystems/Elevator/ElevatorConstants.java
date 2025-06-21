@@ -2,8 +2,8 @@ package com.team5817.frc2025.subsystems.Elevator;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team5817.frc2025.Ports;
-import com.team5817.lib.drivers.ServoConstants;
-import com.team5817.lib.drivers.ServoMotorSubsystem.TalonFXConstants;
+import com.team5817.lib.drivers.Servos.ServoConstants;
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem.TalonFXConstants;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 

@@ -1,8 +1,8 @@
-package com.team5817.lib.drivers;
+package com.team5817.lib.drivers.Servos;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.team5817.lib.drivers.ServoMotorSubsystem.TalonFXConstants;
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem.TalonFXConstants;
 
 public class ServoConstants {
   public String kName = "ERROR_ASSIGN_A_NAME";

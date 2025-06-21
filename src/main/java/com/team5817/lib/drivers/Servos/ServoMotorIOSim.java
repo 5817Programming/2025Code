@@ -1,6 +1,7 @@
-package com.team5817.lib.drivers;
+package com.team5817.lib.drivers.Servos;
 
-import com.team5817.lib.drivers.ServoMotorSubsystem.ControlState;
+
+import com.team5817.lib.drivers.Servos.ServoMotorSubsystem.ControlState;
 
 import edu.wpi.first.wpilibj.Timer;
 

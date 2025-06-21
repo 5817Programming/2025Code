@@ -1,10 +1,10 @@
 package com.team5817.frc2025.subsystems.Intake;
 
 import com.team5817.frc2025.RobotVisualizer;
-import com.team5817.lib.drivers.ServoConstants;
-import com.team5817.lib.drivers.ServoMotorIO;
-import com.team5817.lib.drivers.ServoState;
-import com.team5817.lib.drivers.StateBasedServoMotorSubsystem;
+import com.team5817.lib.drivers.Servos.ServoConstants;
+import com.team5817.lib.drivers.Servos.ServoMotorIO;
+import com.team5817.lib.drivers.Servos.ServoState;
+import com.team5817.lib.drivers.Servos.StateBasedServoMotorSubsystem;
 
 import lombok.Getter;
 
