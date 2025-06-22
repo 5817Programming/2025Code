@@ -8,6 +8,7 @@ import java.util.Optional;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
@@ -16,6 +17,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIO;
+import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIO.GamepieceVisionIOData;
 import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIOInputsAutoLogged;
 
 public class GamepieceVision extends Subsystem {
@@ -50,8 +52,12 @@ public class GamepieceVision extends Subsystem {
 
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
+      if(inputs[i].data.robotToTarget()==null){//If there is no result stop proccessing but process inputs needs a real value
+        inputs[i].data = new GamepieceVisionIOData(new Translation3d(), inputs[i].data.timestamp());
+        Logger.processInputs("GamepieceVision/Camera" + i, inputs[i]);
+        continue;}
       Logger.processInputs("GamepieceVision/Camera" + i, inputs[i]);
-
+      
       final Translation3d robotToTarget = inputs[i].data.robotToTarget();
       final Translation3d fieldGamepiecePose = new Translation3d(robotPose.getTranslation().wpi())
 
@@ -94,7 +100,7 @@ public class GamepieceVision extends Subsystem {
   @Override
   public void outputTelemetry() {
     getBestGamepiecePose().ifPresent(best ->
-        Logger.recordOutput("GamepieceVision/BestGamepiecePose", best));
+        Logger.recordOutput("GamepieceVision/BestGamepiecePose", new edu.wpi.first.math.geometry.Pose2d(best.x(), best.y(), Rotation2d.kZero)));
   }
 
   private static class TrackedGamepiece {

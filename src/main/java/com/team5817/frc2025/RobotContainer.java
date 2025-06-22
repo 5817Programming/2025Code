@@ -191,7 +191,10 @@ public class RobotContainer {
                 mGamepieceVision = new GamepieceVision(
                                 this::wasteVision,
                                 this::getMapleSimPose,
-                                new GamepieceVisionIOSim(this::getMapleSimPose));
+                                new GamepieceVisionIOSim(
+                                        this::getMapleSimPose,
+                                        SimulatedArena.getInstance()
+                                        ));
         }
         private Pose2d getMapleSimPose(){
                 return new Pose2d(driveSimulation.getSimulatedDriveTrainPose());

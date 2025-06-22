@@ -126,19 +126,19 @@ public final class SwerveConstants {
 
   public static final double kTrajectoryDeadband = .03;
 
-  final SwerveModuleSimulationConfig moduleConfig = new SwerveModuleSimulationConfig(
-                        DCMotor.getKrakenX60(1),
-                        DCMotor.getFalcon500(1),
-                        TunerConstants.FrontLeft.DriveMotorGearRatio,
-                        TunerConstants.FrontLeft.SteerMotorGearRatio,
-                        Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
-                        Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
-                        Inches.of(2),
-                        KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-                        1.2);
-                public final static DriveTrainSimulationConfig driveConfig = DriveTrainSimulationConfig.Default()
-                        .withGyro(COTS.ofPigeon2())
-                        .withSwerveModule(() -> new SwerveModuleSimulation(moduleConfig))
+  final static SwerveModuleSimulationConfig moduleConfig = new SwerveModuleSimulationConfig(
+                          DCMotor.getKrakenX60(1),
+                          DCMotor.getFalcon500(1),
+                          TunerConstants.FrontLeft.DriveMotorGearRatio,
+                          TunerConstants.FrontLeft.SteerMotorGearRatio,
+                          Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+                          Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+                          Inches.of(2),
+                          KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
+                          1.2);
+                  public final static DriveTrainSimulationConfig driveConfig = DriveTrainSimulationConfig.Default()
+                          .withGyro(COTS.ofPigeon2())
+                          .withSwerveModule(() -> new SwerveModuleSimulation(moduleConfig))
                         .withBumperSize(Meters.of(.89),Meters.of(.89))
                         .withRobotMass(Pounds.of(115));
 
