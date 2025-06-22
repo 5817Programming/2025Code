@@ -1,4 +1,4 @@
-package com.team5817.frc2025.subsystems.GamePieceVision;
+package com.team5817.lib.drivers.GamepieceVision;
 
 import org.littletonrobotics.junction.AutoLog;
 

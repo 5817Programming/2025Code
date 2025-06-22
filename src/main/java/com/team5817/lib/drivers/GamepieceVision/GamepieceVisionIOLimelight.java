@@ -1,6 +1,5 @@
-package com.team5817.frc2025.subsystems.GamePieceVision;
+package com.team5817.lib.drivers.GamepieceVision;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;

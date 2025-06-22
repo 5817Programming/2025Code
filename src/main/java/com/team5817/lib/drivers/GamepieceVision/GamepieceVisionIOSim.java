@@ -1,4 +1,4 @@
-package com.team5817.frc2025.subsystems.GamePieceVision;
+package com.team5817.lib.drivers.GamepieceVision;
 
 import com.team254.lib.geometry.Pose2d;
 import com.team5817.frc2025.subsystems.GamePieceVision.GamepieceVision.RobotPoseSupplier;

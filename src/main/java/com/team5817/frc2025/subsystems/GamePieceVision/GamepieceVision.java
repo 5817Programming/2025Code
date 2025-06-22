@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 import com.team5817.lib.drivers.Subsystem;
+import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIO;
 
 public class GamepieceVision extends Subsystem {
   private final GamepieceVisionIO[] io;
@@ -52,7 +53,7 @@ public class GamepieceVision extends Subsystem {
 
       final Translation3d robotToTarget = inputs[i].data.robotToTarget();
       final Translation3d fieldGamepiecePose = new Translation3d(robotPose.getTranslation().wpi())
-          
+
           .plus(robotToTarget.rotateBy(robotRotation));
 
       final double timestamp = inputs[i].data.timestamp();
