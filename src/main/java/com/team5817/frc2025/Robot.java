@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
+import org.ironmaple.simulation.SimulatedArena;
+
 /**
  * The main robot class that extends LoggedRobot and contains the robot's
  * lifecycle methods.
@@ -181,6 +183,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void disabledInit() {
+    mRobotContainer.resetSimulation();
     mSubsystemManager.stop();
 
     if (mAutoExecuter != null) {
@@ -236,5 +239,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+    mRobotContainer.displaySimFieldToAdvantageScope();
   }
 }

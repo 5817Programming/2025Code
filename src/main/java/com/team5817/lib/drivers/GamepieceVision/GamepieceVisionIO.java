@@ -16,7 +16,7 @@ public interface GamepieceVisionIO {
 
   record GamepieceVisionIOData(
       Translation3d robotToTarget,
-      Double timestamp) {
+      double timestamp) {
   }
 
 }

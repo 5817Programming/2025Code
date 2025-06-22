@@ -2,8 +2,12 @@ package com.team5817.frc2025;
 
 import java.util.Optional;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.SynchronousPIDF;
 import com.team5817.frc2025.generated.TunerConstants;
@@ -36,10 +40,12 @@ import com.team5817.lib.drivers.Rollers.RollerSubsystemIOSim;
 import com.team5817.lib.drivers.Rollers.RollerSubsystemIOTalonFX;
 import com.team5817.lib.swerve.GyroIO;
 import com.team5817.lib.swerve.GyroIOPigeon2;
+import com.team5817.lib.swerve.GyroIOSim;
 import com.team5817.lib.swerve.ModuleIO;
 import com.team5817.lib.swerve.ModuleIOSim;
 import com.team5817.lib.swerve.ModuleIOTalonFX;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -52,6 +58,7 @@ public class RobotContainer {
         public Vision mVision;
         public Superstructure mSuperstructure;
         public GamepieceVision mGamepieceVision;
+        public  SwerveDriveSimulation driveSimulation = null;
 
         public RobotContainer() {
                 switch (RobotMode.mode) {
@@ -133,7 +140,7 @@ public class RobotContainer {
                                 new GamepieceVisionIOLimelight(
                                                 "Limelight-back",
                                                 VisionConstants.robotToCameraBack,
-                                                Units.inchesToMeters(2)));
+                                                Units.inchesToMeters(2)));     
         }
 
         public void wasteVision(Optional<Translation2d> gamepiecePoseMeters, double timestampSeconds) {
@@ -144,6 +151,9 @@ public class RobotContainer {
         }
 
         public void makeSimulatedRobot() {
+                driveSimulation = new SwerveDriveSimulation(SwerveConstants.driveConfig, new Pose2d(3, 3, new Rotation2d()).wpi());
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+                
                 mEndEffectorWrist = new EndEffectorWrist(
                                 new ServoMotorIOSim(
                                                 EndEffectorConstants.EndEffectorWristConstants.kWristServoConstants));
@@ -161,28 +171,30 @@ public class RobotContainer {
                                 new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants));
 
                 mDrive = new Drive(
-                                new GyroIO() {
-                                },
-                                new ModuleIOSim(TunerConstants.FrontLeft),
-                                new ModuleIOSim(TunerConstants.FrontRight),
-                                new ModuleIOSim(TunerConstants.BackLeft),
-                                new ModuleIOSim(TunerConstants.BackRight),
+                                new GyroIOSim(driveSimulation.getGyroSimulation()),
+                                new ModuleIOSim(driveSimulation.getModules()[0]),
+                                new ModuleIOSim(driveSimulation.getModules()[1]),
+                                new ModuleIOSim(driveSimulation.getModules()[2]),
+                                new ModuleIOSim(driveSimulation.getModules()[3]),
                                 SwerveConstants.simStabilizePID,
                                 SwerveConstants.simSnapPID);
 
                 mVision = new Vision(
                                 mDrive::addVisionMeasurement,
                                 new VisionIOPhotonVisionSim("limelight-up", VisionConstants.robotToCameraUp,
-                                                mDrive::getPose),
+                                                this::getMapleSimPose),
                                 new VisionIOPhotonVisionSim("limelight-right", VisionConstants.robotToCameraLeft,
-                                                mDrive::getPose),
+                                                this::getMapleSimPose),
                                 new VisionIOPhotonVisionSim("limelight-left", VisionConstants.robotToCameraRight,
-                                                mDrive::getPose));
+                                                this::getMapleSimPose));
 
                 mGamepieceVision = new GamepieceVision(
                                 this::wasteVision,
-                                mDrive::getPose,
-                                new GamepieceVisionIOSim(mDrive::getPose));
+                                this::getMapleSimPose,
+                                new GamepieceVisionIOSim(this::getMapleSimPose));
+        }
+        private Pose2d getMapleSimPose(){
+                return new Pose2d(driveSimulation.getSimulatedDriveTrainPose());
         }
 
         public void makeEmptyRobot() {
@@ -235,4 +247,23 @@ public class RobotContainer {
                                 new GamepieceVisionIO() {
                                 });
         }
+
+
+     public void resetSimulation() {
+        if (RobotMode.mode != RobotMode.Mode.SIM) return;
+        driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()).wpi());
+        SimulatedArena.getInstance().resetFieldForAuto();
+    }
+
+    public void displaySimFieldToAdvantageScope() {
+        if (RobotMode.mode != RobotMode.Mode.SIM) return;
+
+        Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+        Logger.recordOutput(
+                "FieldSimulation/Coral",
+                SimulatedArena.getInstance().getGamePiecesByType("Coral").toArray(new Pose3d[0]));
+                Logger.recordOutput(
+                        "FieldSimulation/Algae",
+                        SimulatedArena.getInstance().getGamePiecesByType("Algae").toArray(new Pose3d[0]));
+    }
 }

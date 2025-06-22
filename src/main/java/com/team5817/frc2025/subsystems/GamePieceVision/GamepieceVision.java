@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIO;
+import com.team5817.lib.drivers.GamepieceVision.GamepieceVisionIOInputsAutoLogged;
 
 public class GamepieceVision extends Subsystem {
   private final GamepieceVisionIO[] io;

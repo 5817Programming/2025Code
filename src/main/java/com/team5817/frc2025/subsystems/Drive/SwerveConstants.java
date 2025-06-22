@@ -1,5 +1,16 @@
 package com.team5817.frc2025.subsystems.Drive;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -9,10 +20,11 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.motion.MotionProfileConstraints;
 import com.team254.lib.swerve.SwerveDriveKinematics;
-import com.team254.lib.swerve.SwerveKinematicLimits;
 import com.team254.lib.util.SynchronousPIDF;
 import com.team5817.frc2025.RobotConstants;
+import com.team5817.frc2025.generated.TunerConstants;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -114,28 +126,21 @@ public final class SwerveConstants {
 
   public static final double kTrajectoryDeadband = .03;
 
-  public static final SwerveKinematicLimits kSwerveKinematicLimits = new SwerveKinematicLimits();
-
-  static {
-    kSwerveKinematicLimits.kMaxDriveVelocity = maxSpeed;
-    kSwerveKinematicLimits.kMaxDriveAcceleration = 200;
-    kSwerveKinematicLimits.kMaxSteeringVelocity = maxAngularVelocity;
-  }
-  public static final SwerveKinematicLimits kExtendedKinematicLimits = new SwerveKinematicLimits();
-
-  static {
-    kExtendedKinematicLimits.kMaxDriveVelocity = 3;
-    kExtendedKinematicLimits.kMaxDriveAcceleration = 5;
-    kExtendedKinematicLimits.kMaxSteeringVelocity = maxAngularVelocity;
-  }
-
-  public static final SwerveKinematicLimits kSwerveUncappedKinematicLimits = new SwerveKinematicLimits();
-
-  static {
-    kSwerveUncappedKinematicLimits.kMaxDriveVelocity = maxSpeed;
-    kSwerveUncappedKinematicLimits.kMaxDriveAcceleration = Double.MAX_VALUE;
-    kSwerveUncappedKinematicLimits.kMaxSteeringVelocity = maxAngularVelocity;
-  }
+  final SwerveModuleSimulationConfig moduleConfig = new SwerveModuleSimulationConfig(
+                        DCMotor.getKrakenX60(1),
+                        DCMotor.getFalcon500(1),
+                        TunerConstants.FrontLeft.DriveMotorGearRatio,
+                        TunerConstants.FrontLeft.SteerMotorGearRatio,
+                        Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+                        Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+                        Inches.of(2),
+                        KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
+                        1.2);
+                public final static DriveTrainSimulationConfig driveConfig = DriveTrainSimulationConfig.Default()
+                        .withGyro(COTS.ofPigeon2())
+                        .withSwerveModule(() -> new SwerveModuleSimulation(moduleConfig))
+                        .withBumperSize(Meters.of(.89),Meters.of(.89))
+                        .withRobotMass(Pounds.of(115));
 
   public static final double kAutoAlignAllowableDistance = 2.0; // Meters
 
