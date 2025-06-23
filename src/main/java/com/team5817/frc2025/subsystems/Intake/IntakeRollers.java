@@ -21,9 +21,9 @@ public class IntakeRollers extends Subsystem {
       RollerSubsystemIO FeederIO,
       RollerSubsystemIO LowIndexerIO,
       RollerSubsystemIO SideIndexerIO) {
-    this.feeder = new RollerSubsystem<FeederState>(FeederState.IDLE, "Intake Feeder", FeederIO);
-    this.lowIndexer = new RollerSubsystem<LowIndexerState>(LowIndexerState.IDLE, "Intake Bottom Indexer", LowIndexerIO);
-    this.sideIndexer = new RollerSubsystem<SideIndexerState>(SideIndexerState.IDLE, "Intake Side Indexer",
+    this.feeder = new RollerSubsystem<FeederState>(FeederState.IDLE, "Intake/Feeder", FeederIO);
+    this.lowIndexer = new RollerSubsystem<LowIndexerState>(LowIndexerState.IDLE, "Intake/Bottom Indexer", LowIndexerIO);
+    this.sideIndexer = new RollerSubsystem<SideIndexerState>(SideIndexerState.IDLE, "Intake/Side Indexer",
         SideIndexerIO);
   }
 

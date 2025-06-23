@@ -45,8 +45,6 @@ public class IntakeConstants {
 
       kDeployServoConstants.kEnableSupplyCurrentLimit = true;
       kDeployServoConstants.kSupplyCurrentLimit = 80; // amps
-      kDeployServoConstants.kSupplyCurrentThreshold = 80; // amps
-      kDeployServoConstants.kSupplyCurrentTimeout = 0.01; // seconds
 
       kDeployServoConstants.kEnableStatorCurrentLimit = true;
       kDeployServoConstants.kStatorCurrentLimit = 80; // amps

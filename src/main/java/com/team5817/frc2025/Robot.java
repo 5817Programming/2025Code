@@ -22,7 +22,6 @@ import com.team5817.frc2025.autos.Modes.Characterize;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.controlboard.ControlBoard;
 import com.team5817.frc2025.controlboard.DriverControls;
-import com.team5817.frc2025.loops.Looper;
 import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.lib.Elastic;
 import com.team5817.lib.Util;
@@ -49,7 +48,6 @@ public class Robot extends LoggedRobot {
   private AutoModeFactory mAutoModeSelector;
   DriverControls controls;
   ControlBoard controlBoard;
-  private final Looper mEnabledLooper = new Looper();
 
   Drive mDrive;
 
@@ -99,7 +97,7 @@ public class Robot extends LoggedRobot {
     mRobotContainer = new RobotContainer();
 
     mDrive = mRobotContainer.mDrive;
-    mAutoModeSelector = new AutoModeFactory(mRobotContainer.mSuperstructure, mDrive);
+    mAutoModeSelector = new AutoModeFactory(mRobotContainer.mSuperstructure, mDrive, mRobotContainer.mGamepieceVision);
     mSubsystemManager = SubsystemManager.getInstance();
 
     Elastic.selectTab("Pre Match");
@@ -107,8 +105,7 @@ public class Robot extends LoggedRobot {
     controls = new DriverControls(mDrive, mRobotContainer.mSuperstructure);
     controlBoard = controls.mControlBoard;
 
-    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-    mEnabledLooper.start();
+    mSubsystemManager.start();
     Logger.recordOutput("isComp", RobotConstants.isComp);
   }
 
@@ -124,7 +121,7 @@ public class Robot extends LoggedRobot {
       needsZero = false;
     }
     Logger.recordOutput("Elastic/Match Time", Timer.getMatchTime());
-    mEnabledLooper.update();
+    mSubsystemManager.updateSubsystems();
     RobotVisualizer.outputTelemetry();
   }
 
@@ -170,7 +167,7 @@ public class Robot extends LoggedRobot {
     controls.twoControllerMode();
     controlBoard.update();
 
-    mDrive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+    mDrive.feedTeleopSetpoint(ChassisSpeeds.fromFieldRelativeSpeeds(
         controlBoard.getSwerveTranslation().x(),
         controlBoard.getSwerveTranslation().y(),
         controlBoard.getSwerveRotation(),

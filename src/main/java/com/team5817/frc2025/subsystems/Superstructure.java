@@ -2,8 +2,6 @@ package com.team5817.frc2025.subsystems;
 
 import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.field.FieldConstants.ReefLevel;
-import com.team5817.frc2025.loops.ILooper;
-import com.team5817.frc2025.loops.Loop;
 import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.frc2025.subsystems.Elevator.Elevator;
 import com.team5817.frc2025.subsystems.Elevator.ElevatorConstants;
@@ -17,6 +15,7 @@ import com.team5817.lib.requests.ParallelRequest;
 import com.team5817.lib.requests.Request;
 import com.team5817.lib.requests.SequentialRequest;
 import com.team5817.lib.requests.WaitRequest;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 import java.util.ArrayList;
@@ -187,16 +186,14 @@ public class Superstructure extends Subsystem {
     queuedRequests.add(req);
   }
 
-  @Override
-  public void registerEnabledLoops(ILooper enabledLooper) {
-    enabledLooper.register(new Loop() {
+
       @Override
-      public void onStart(double timestamp) {
+      public void start() {
         clearRequestQueue();
       }
 
       @Override
-      public void onLoop(double timestamp) {
+      public void periodic() {
         manageRequests();
         if (DriverStation.isEnabled() && DriverStation.isTeleopEnabled()) {
           double dist = driverAllowsPoseComp ? (-mDrive.getAutoAlignError().x()) : 0;
@@ -207,8 +204,6 @@ public class Superstructure extends Subsystem {
           mEndEffectorWrist.updateOnBranchDistance(-1);
         }
       }
-    });
-  }
 
   public void manageRequests() {
     try {
@@ -429,4 +424,9 @@ public class Superstructure extends Subsystem {
       }
     };
   }
+
+public boolean hasPiece() {
+    return mDrive.getAutoAlignError().norm()<0.3&&DriverStation.isAutonomous();
+}
+
 }

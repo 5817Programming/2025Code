@@ -122,7 +122,7 @@ public class Drive extends Subsystem {
   @Accessors(prefix = "m")
   private static AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
   @Setter
-  private boolean autoAlignFinishedOverrride = false;
+  private boolean autoAlignFinishedOverride = false;
 
   public static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -223,9 +223,7 @@ public class Drive extends Subsystem {
         mControlStateHasChanged = false;
         return speeds;
       } else {
-        ChassisSpeeds speed = mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(),
-            getPose()
-                .withRotation(getHeading()));
+        ChassisSpeeds speed = mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(), getPose());
         if (speed != null) {
           return speed;
         }
@@ -258,7 +256,7 @@ public class Drive extends Subsystem {
 
   public void autoAlign(AlignmentType type) {
     setAlignment(type);
-    alignDrive(findTargetPoint());
+    alignDrive(findTargetPoint(), mAlignment.tolerance);
   }
 
   /**
@@ -270,12 +268,13 @@ public class Drive extends Subsystem {
     return AutoAlignPointSelector.chooseTargetPoint(getPose(), mAlignment);
   }
 
-  private void alignDrive(Pose2d targetPoint) {
-    autoAlignFinishedOverrride = false;
+  public void alignDrive(Pose2d targetPoint, Pose2d tolerance) {
+    autoAlignFinishedOverride = false;
     if (targetPoint == null) {
+      System.out.println("Invalid target point");
       return;
     }
-    mAutoAlignMotionPlanner.setTargetPoint(targetPoint, mAlignment.tolerance);
+    mAutoAlignMotionPlanner.setTargetPoint(targetPoint, tolerance);
     if (mControlState != DriveControlState.AUTOALIGN) {
       mAutoAlignMotionPlanner.reset();
       setControlState(DriveControlState.AUTOALIGN);
@@ -299,7 +298,7 @@ public class Drive extends Subsystem {
    * @return True if auto alignment is complete, false otherwise.
    */
   public boolean getAutoAlignComplete() {
-    if (autoAlignFinishedOverrride)
+    if (autoAlignFinishedOverride)
       return true;
     return mAutoAlignMotionPlanner.getAutoAlignComplete();
   }
@@ -310,7 +309,6 @@ public class Drive extends Subsystem {
    * @return True if auto alignment is complete, false otherwise.
    */
   public Translation2d getAutoAlignError() {
-    mAutoAlignMotionPlanner.setTargetPoint(findTargetPoint(), mAlignment.tolerance);
     mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(),
         getPose()
             .withRotation(getHeading()));
@@ -337,11 +335,28 @@ public class Drive extends Subsystem {
     return mMotionPlanner.isPathFinished();
   }
 
+  public void updateAuto(){
+    switch (mControlState) {
+      case PATH_FOLLOWING:
+        updatePathFollower();
+        break;
+
+      case AUTOALIGN:
+        runVelocity(mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(), getPose()));
+        break;
+
+      default:
+        System.out.println("Unsupported Drive Auto ControlState");
+        break;
+    }
+  }
+
+  
   @Override
   public void readPeriodicInputs() {
-    if (mControlState == DriveControlState.PATH_FOLLOWING)
-      updatePathFollower();
-
+    if(DriverStation.isAutonomous())
+      updateAuto();
+  
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -386,12 +401,18 @@ public class Drive extends Subsystem {
   }
 
   @Override
-  public void writePeriodicOutputs() {
+  public void outputTelemetry() {
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+
+    Logger.recordOutput("Drive/State", mControlState);
+    Logger.recordOutput("Drive/SwerveStates/Measured", getModuleStates());
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Measured", getChassisSpeeds().wpi());
+
+    Logger.recordOutput("AutoAlign/mAlignment", mAlignment);
   }
 
   /**
@@ -406,8 +427,8 @@ public class Drive extends Subsystem {
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+    Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", discreteSpeeds.wpi());
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -415,7 +436,7 @@ public class Drive extends Subsystem {
     }
 
     // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -463,7 +484,6 @@ public class Drive extends Subsystem {
    * Returns the module states (turn angles and drive velocities) for all of the
    * modules.
    */
-  @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
@@ -485,7 +505,6 @@ public class Drive extends Subsystem {
   }
 
   /** Returns the measured chassis speeds of the robot. */
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
   private ChassisSpeeds getChassisSpeeds() {
     return new ChassisSpeeds(kinematics.toChassisSpeeds(getModuleStates()));
   }
@@ -534,6 +553,7 @@ public class Drive extends Subsystem {
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation.wpi(), getModulePositions(), pose.wpi());
   }
+  public void simResetWorldPose(Pose2d newPose){}
 
   /** Adds a new timestamped vision measurement. */
   public void addVisionMeasurement(

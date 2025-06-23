@@ -1,7 +1,5 @@
 package com.team5817.lib.drivers;
 
-import com.team5817.frc2025.loops.ILooper;
-
 /**
  * The Subsystem abstract class, which serves as a basic framework for all robot
  * subsystems. Each subsystem outputs
@@ -24,6 +22,8 @@ public abstract class Subsystem {
    */
   public void writeToLog() {
   }
+
+  public void start(){}
 
   /**
    * Reads periodic inputs. This is an optional design pattern for caching
@@ -54,16 +54,9 @@ public abstract class Subsystem {
   /**
    * Outputs telemetry data.
    */
-  public void outputTelemetry() {
-  }
+  public void outputTelemetry() {}
 
-  /**
-   * Registers enabled loops with the subsystem.
-   * 
-   * @param enabledLooper the looper to register
-   */
-  public void registerEnabledLoops(ILooper enabledLooper) {
-  }
+  public void periodic(){}
 
   /**
    * Checks the system for any issues.

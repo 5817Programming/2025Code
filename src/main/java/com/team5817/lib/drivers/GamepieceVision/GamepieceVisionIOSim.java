@@ -1,11 +1,16 @@
 package com.team5817.lib.drivers.GamepieceVision;
 
+import java.util.List;
+
 import org.ironmaple.simulation.SimulatedArena;
+import org.littletonrobotics.junction.Logger;
 
 import com.team254.lib.geometry.Pose2d;
 import com.team5817.frc2025.subsystems.GamePieceVision.GamepieceVision.RobotPoseSupplier;
+import com.team5817.lib.util.AllianceFlipUtil;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
@@ -26,15 +31,31 @@ public class GamepieceVisionIOSim implements GamepieceVisionIO {
     Translation2d robotTranslation = robotPose.getTranslation().wpi();
     edu.wpi.first.math.geometry.Rotation2d robotRotation = robotPose.getRotation().wpi();
 
-    for (Pose3d gamepiece : mSimulatedArena.getGamePiecesByType("Coral")) {
+    List<Pose3d> gamepieces = mSimulatedArena.getGamePiecesByType("Coral");
+
+    Pose3d base = new Pose3d(2, 1.283, 0, Rotation3d.kZero);
+
+    Pose3d cornerBL = base;
+    Pose3d cornerBR = AllianceFlipUtil.apply(base, true, false);
+    Pose3d cornerTL = AllianceFlipUtil.apply(base, false, true);
+    Pose3d cornerTR = AllianceFlipUtil.apply(base, true, true);
+
+    gamepieces.add(cornerBL);
+    gamepieces.add(cornerBR);
+    gamepieces.add(cornerTL);
+    gamepieces.add(cornerTR);
+
+    Logger.recordOutput("GamepieceVision/Sim Coral", gamepieces.toArray(new Pose3d[0]));
+
+    for (Pose3d gamepiece : gamepieces) {
       Translation2d gamepieceTranslation = gamepiece.toPose2d().getTranslation();
 
       Translation2d delta = gamepieceTranslation.minus(robotTranslation);
       Translation2d relativeToRobot = delta.rotateBy(robotRotation.unaryMinus());
 
       if (relativeToRobot.getX() < 0 
-          && relativeToRobot.getNorm() <= 1.5 
-          && Math.abs(relativeToRobot.getX())>Math.abs(relativeToRobot.getY())*2) {
+          && relativeToRobot.getNorm() <= 2
+          && Math.abs(relativeToRobot.getX())>Math.abs(relativeToRobot.getY())) {
         Translation3d robotToTarget = new Translation3d(
           relativeToRobot.getX(),
           relativeToRobot.getY(),

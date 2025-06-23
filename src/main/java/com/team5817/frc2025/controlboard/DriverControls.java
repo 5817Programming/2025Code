@@ -80,7 +80,7 @@ public class DriverControls {
       if (s.getGoalState().goal.mAlignmentType != AlignmentType.NONE)
         d.autoAlign(s.getGoalState().goal.mAlignmentType);
       else
-        d.setAutoAlignFinishedOverrride(true);
+        d.setAutoAlignFinishedOverride(true);
     }
     if (driver.POV270.isBeingPressed())
       d.autoAlign(AlignmentType.CORAL_SCORE_LEFT);

@@ -71,8 +71,8 @@ public class GamepieceVision extends Subsystem {
       }
     }
 
-    // Remove stale observations, leave at least one
-    recentObservations.removeIf(obs -> (now - obs.timestamp > MAX_OBSERVATION_AGE_SEC) && recentObservations.size() > 1);
+    // Remove stale observations
+    recentObservations.removeIf(obs -> (now - obs.timestamp > MAX_OBSERVATION_AGE_SEC));
 
     // Accept best observation
     final Optional<Translation2d> bestPose = getBestGamepiecePose();

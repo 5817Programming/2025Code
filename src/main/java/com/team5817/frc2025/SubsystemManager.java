@@ -1,27 +1,17 @@
 package com.team5817.frc2025;
 
-import com.team5817.frc2025.loops.ILooper;
-import com.team5817.frc2025.loops.Loop;
-import com.team5817.frc2025.loops.Looper;
 import com.team5817.lib.drivers.Subsystem;
 
-import edu.wpi.first.wpilibj.Timer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Used to reset, start, stop, and update all subsystems at once.
  */
-public class SubsystemManager implements ILooper {
+public class SubsystemManager {
   public static SubsystemManager mInstance = null;
 
   private List<Subsystem> mAllSubsystems;
-  private List<Loop> mLoops = new ArrayList<>();
-  private double read_dt = 0.0;
-  private double on_loop_dt = 0.0;
-  @SuppressWarnings("unused")
-  private double write_dt = 0.0;
 
   private SubsystemManager() {
   }
@@ -89,50 +79,19 @@ public class SubsystemManager implements ILooper {
     mAllSubsystems = Arrays.asList(allSubsystems);
   }
 
-  private class EnabledLoop implements Loop {
-    @Override
-    public void onStart(double timestamp) {
-      mLoops.forEach(l -> l.onStart(timestamp));
-    }
-
-    @Override
-    public void onLoop(double timestamp) {
-      // Read
-      for (int i = 0; i < mAllSubsystems.size(); i++) {
-        mAllSubsystems.get(i).readPeriodicInputs();
-      }
-
-      // On loop
-      for (int i = 0; i < mLoops.size(); i++) {
-        mLoops.get(i).onLoop(timestamp);
-      }
-      on_loop_dt = Timer.getTimestamp() - (timestamp + read_dt);
-
-      // Write
-      for (int i = 0; i < mAllSubsystems.size(); i++) {
-        mAllSubsystems.get(i).writePeriodicOutputs();
-      }
-      write_dt = Timer.getTimestamp() - (timestamp + on_loop_dt);
-      SubsystemManager.getInstance().outputTelemetry();
-
-      // Telemetry
-      outputTelemetry();
-    }
+  public void updateSubsystems(){
+    for(Subsystem s:mAllSubsystems)
+      s.readPeriodicInputs();
+    for(Subsystem s:mAllSubsystems)
+      s.periodic();
+    for(Subsystem s:mAllSubsystems)
+      s.writePeriodicOutputs();
+    outputTelemetry();
   }
 
-  /**
-   * Registers the enabled loops for all subsystems.
-   *
-   * @param enabledLooper the looper to register the enabled loops with.
-   */
-  public void registerEnabledLoops(Looper enabledLooper) {
-    mAllSubsystems.forEach(s -> s.registerEnabledLoops(this));
-    enabledLooper.register(new EnabledLoop());
-  }
-
-  @Override
-  public void register(Loop loop) {
-    mLoops.add(loop);
-  }
+public void start() {
+    for(Subsystem s: mAllSubsystems)
+      s.start();
+}
 
 }

@@ -83,8 +83,6 @@ public class EndEffectorConstants {
 
       kWristServoConstants.kEnableSupplyCurrentLimit = true;
       kWristServoConstants.kSupplyCurrentLimit = 40; // amps
-      kWristServoConstants.kSupplyCurrentThreshold = 40; // amps
-      kWristServoConstants.kSupplyCurrentTimeout = 0.01; // seconds
 
       kWristServoConstants.kEnableStatorCurrentLimit = true;
       kWristServoConstants.kStatorCurrentLimit = 30; // amps

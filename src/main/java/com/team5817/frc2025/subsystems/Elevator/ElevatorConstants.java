@@ -50,8 +50,6 @@ public final class ElevatorConstants {
 
     kElevatorServoConstants.kEnableSupplyCurrentLimit = true;
     kElevatorServoConstants.kSupplyCurrentLimit = 40; // amps
-    kElevatorServoConstants.kSupplyCurrentThreshold = 40; // amps
-    kElevatorServoConstants.kSupplyCurrentTimeout = 0.01; // seconds
 
     kElevatorServoConstants.kEnableStatorCurrentLimit = true;
     kElevatorServoConstants.kStatorCurrentLimit = 80; // amps

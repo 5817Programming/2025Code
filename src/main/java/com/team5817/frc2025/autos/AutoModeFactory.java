@@ -15,13 +15,15 @@ import com.team5817.frc2025.autos.Modes.DoNothingMode;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
 import com.team5817.frc2025.subsystems.Drive.Drive;
+import com.team5817.frc2025.subsystems.GamePieceVision.GamepieceVision;
 
 /**
  * This class is responsible for selecting the autonomous mode for the robot.
  */
 public class AutoModeFactory {
-  private Drive d;
-  private Superstructure s;
+  private final Drive d;
+  private final Superstructure s;
+  private final GamepieceVision g;
 
   public enum ScoringLocation {
     _7A,
@@ -113,9 +115,10 @@ public class AutoModeFactory {
    * Initializes the SendableChoosers for starting position, pickup location, and
    * scoring locations.
    */
-  public AutoModeFactory(Superstructure s, Drive d) {
+  public AutoModeFactory(Superstructure s, Drive d, GamepieceVision g) {
     this.s = s;
     this.d = d;
+    this.g = g;
     mStartingPositionSelector.setDefaultOption("Proccessor Side", StartingPosition.PROCCESSOR_SIDE);
     mStartingPositionSelector.addOption("Center Processor Side", StartingPosition.CENTER_PROCESS);
     mStartingPositionSelector.addOption("Center Blank Side", StartingPosition.CENTER_BLANK);
@@ -223,14 +226,14 @@ public class AutoModeFactory {
       case CUSTOM_MODE:
         return Optional.of(new CustomMode(mCachedStartingPosition, mCachedFirstPickupLocation,
             mCachedSecondPickupLocation, mCachedThirdPickupLocation, mCachedFirstScore, mCachedSecondScore,
-            mCachedThirdScore, mCachedScoreAmount, s, d));
+            mCachedThirdScore, mCachedScoreAmount, s, d, g));
       case ONE_NET:
         return Optional.of(new Center11(mCachedStartingPosition, s, d));
       case TWO_NET:
         return Optional.of(new Center12(mCachedStartingPosition, s, d));
       case SIDE_MAIN:
         return Optional.of(new CustomMode(mCachedStartingPosition, PickupLocation.GROUND, PickupLocation.GROUND,
-            PickupLocation.FAR, ScoringLocation._8A, ScoringLocation._7A, ScoringLocation._7B, 3, s, d));
+            PickupLocation.FAR, ScoringLocation._8A, ScoringLocation._7A, ScoringLocation._7B, 3, s, d, g));
       default:
         System.out.println("ERROR: unexpected auto mode: " + mode);
         break;

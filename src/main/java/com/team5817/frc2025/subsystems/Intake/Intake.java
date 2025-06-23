@@ -2,7 +2,6 @@ package com.team5817.frc2025.subsystems.Intake;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.team5817.frc2025.loops.ILooper;
 import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.drivers.Rollers.RollerSubsystemIO;
 import com.team5817.lib.drivers.Servos.ServoMotorIO;
@@ -70,12 +69,6 @@ public class Intake extends Subsystem {
   @Override
   public boolean checkSystem() {
     return mIntakeRollers.checkSystem() && mIntakeDeploy.checkSystem();
-  }
-
-  @Override
-  public void registerEnabledLoops(ILooper enabledLooper) {
-    mIntakeRollers.registerEnabledLoops(enabledLooper);
-    mIntakeDeploy.registerEnabledLoops(enabledLooper);
   }
 
   @Override

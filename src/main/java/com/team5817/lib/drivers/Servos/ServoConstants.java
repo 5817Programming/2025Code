@@ -31,8 +31,6 @@ public class ServoConstants {
   public double kPositionKp = 0;
   public double kPositionKi = 0;
   public double kPositionKd = 0;
-  public double kPositionKf = 0;
-  public int kPositionDeadband = 0; // Ticks
 
   public double kVelocityFeedforward = 0;
   public double kArbitraryFeedforward = 0;
@@ -42,8 +40,6 @@ public class ServoConstants {
   public double kRampRate = 0.0; // s
 
   public int kSupplyCurrentLimit = 60; // amps
-  public int kSupplyCurrentThreshold = 60;// TODO look at what this should be add to roller if good
-  public double kSupplyCurrentTimeout = 0.0; // Seconds TODO look at what this should be add to roller if good
   public boolean kEnableSupplyCurrentLimit = false;
 
   public int kStatorCurrentLimit = 40; // amps
@@ -56,8 +52,6 @@ public class ServoConstants {
 
   public double kMaxUnitsLimit = Double.POSITIVE_INFINITY;
   public double kMinUnitsLimit = Double.NEGATIVE_INFINITY;
-
-  public int kStatusFrame8UpdateRate = 1000;
 
   public double kHomingTimeout = 0;
   public double kHomingVelocityWindow = 0;

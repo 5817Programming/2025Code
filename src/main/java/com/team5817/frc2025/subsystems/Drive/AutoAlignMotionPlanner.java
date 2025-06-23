@@ -56,7 +56,7 @@ public class AutoAlignMotionPlanner {
     mXController.reset();
     mYController.reset();
     this.poseDeadband = Pose2d.fromTranslation(poseDeadband.getTranslation()).withRotation(poseDeadband.getRotation());
-    Logger.recordOutput("Align Point", new edu.wpi.first.math.geometry.Pose2d(
+    Logger.recordOutput("AutoAlign/Point", new edu.wpi.first.math.geometry.Pose2d(
         mFieldToTargetPoint.getTranslation().wpi(), mFieldToTargetPoint.getRotation().wpi()));
   }
 
@@ -69,6 +69,11 @@ public class AutoAlignMotionPlanner {
    * @return The updated chassis speeds.
    */
   public ChassisSpeeds updateAutoAlign(double timestamp, Pose2d current_pose) {
+    Logger.recordOutput("AutoAlign/Valid Point", mFieldToTargetPoint!=null);
+
+    if(mFieldToTargetPoint==null)
+      return new ChassisSpeeds();
+    
     mXController.setSetpoint(mFieldToTargetPoint.getTranslation().x());
     mYController.setSetpoint(mFieldToTargetPoint.getTranslation().y());
 
@@ -93,17 +98,17 @@ public class AutoAlignMotionPlanner {
         .getTranslation().x();
     boolean yWithinDeadband = Math.abs(mYController.getSetpoint() - current_pose.getTranslation().y()) < poseDeadband
         .getTranslation().y();
-    if (mAutoAlignComplete)
-      setpoint = ChassisSpeeds.fromFieldRelativeSpeeds(
-          0.0,
-          0.0,
-          0.0,
-          current_pose.getRotation());
     setpoint = ChassisSpeeds.fromFieldRelativeSpeeds(
         xWithinDeadband ? 0.0 : xOutput,
         yWithinDeadband ? 0.0 : yOutput,
         thetaWithinDeadband ? 0.0 : thetaOutput,
         current_pose.getRotation());
+        if (mAutoAlignComplete)
+    setpoint = ChassisSpeeds.fromFieldRelativeSpeeds(
+        0.0,
+        0.0,
+        0.0,
+            current_pose.getRotation());
     mAutoAlignComplete = thetaWithinDeadband && xWithinDeadband && yWithinDeadband;
     Logger.recordOutput("AutoAlign/xDone", xWithinDeadband);
     Logger.recordOutput("AutoAlign/yDone", yWithinDeadband);

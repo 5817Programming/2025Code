@@ -16,7 +16,6 @@ import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
-import com.team5817.lib.RobotMode;
 import com.team5817.lib.motion.Trajectory;
 import com.team5817.lib.motion.TrajectorySet;
 
@@ -75,9 +74,7 @@ public class Center12 extends AutoBase {
    */
   @Override
   public void routine() {
-    if (RobotMode.isSim()) {
-      d.setPose(t.initalPose());
-    }
+    d.simResetWorldPose(t.initalPose());
     s.setReadyToScore(false);
     r(new ParallelAction(List.of(
         new TrajectoryAction(t.next(), 2, d),

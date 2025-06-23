@@ -80,7 +80,7 @@ public class AutoAlignPointSelector {
                 closestDistance = distance;
                 closestPose = to.get(i);
                 a = points.get(i);
-                Logger.recordOutput("Alignment Point", a.getAllowedAllignments().toString());
+                Logger.recordOutput("AutoAlign/Closest Point", a.getAllowedAllignments().toString());
             }
         }
         return (closestPose);

@@ -53,4 +53,20 @@ public class AllianceFlipUtil {
     return DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
   }
+
+    /**
+   * Explicitly flip a pose across the X and/or Y axis of the field, regardless of alliance.
+   */
+  public static Pose3d apply(Pose3d pose, boolean flipX, boolean flipY) {
+    double x = flipX ? FieldLayout.kFieldLength - pose.getX() : pose.getX();
+    double y = flipY ? FieldLayout.kFieldWidth - pose.getY() : pose.getY();
+    Rotation3d rotation = pose.getRotation();
+
+    if (flipX ^ flipY) {
+      // Flip rotation 180 degrees around Z if flipping across one axis
+      rotation = rotation.rotateBy(new Rotation3d(0, 0, Math.PI));
+    }
+
+    return new Pose3d(new Translation3d(x, y, pose.getZ()), rotation);
+  }
 }

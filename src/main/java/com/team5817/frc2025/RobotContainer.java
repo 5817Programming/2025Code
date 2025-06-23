@@ -50,32 +50,29 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class RobotContainer {
-        public Drive mDrive;
-        public Elevator mElevator;
-        public EndEffectorWrist mEndEffectorWrist;
-        public RollerSubsystem<EndEffectorConstants.RollerState> mEndEffectorRollers;
-        public Intake mIntake;
-        public Vision mVision;
-        public Superstructure mSuperstructure;
-        public GamepieceVision mGamepieceVision;
-        public  SwerveDriveSimulation driveSimulation = null;
+        public Drive mDrive = null;
+        public Elevator mElevator = null;
+        public EndEffectorWrist mEndEffectorWrist = null;
+        public RollerSubsystem<EndEffectorConstants.RollerState> mEndEffectorRollers = null;
+        public Intake mIntake = null;
+        public Vision mVision = null;
+        public Superstructure mSuperstructure = null;
+        public GamepieceVision mGamepieceVision = null;
+        public SwerveDriveSimulation driveSimulation = null;
 
         public RobotContainer() {
                 switch (RobotMode.mode) {
                         case REAL:
                                 makeRealRobot();
                                 break;
-                        case REPLAY:
-                                makeEmptyRobot();
-                                break;
                         case SIM:
                                 makeSimulatedRobot();
                                 break;
                         default:
-                                makeEmptyRobot();
                                 break;
-
                 }
+
+                // makeEmptyRobot();
 
                 SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
@@ -118,8 +115,9 @@ public class RobotContainer {
                                 new RollerSubsystemIOTalonFX(Ports.BOTTOM_INDEXER,
                                                 IntakeConstants.RollerConstants.motorConstants, 1),
                                 new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
-                mElevator = new Elevator(
-                                new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
+
+                mElevator = new Elevator(new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
+
                 mVision = new Vision(
                                 mDrive::addVisionMeasurement,
                                 new VisionIOLimelight("limelight-up", mDrive::getHeading),
@@ -134,6 +132,7 @@ public class RobotContainer {
                                 new ModuleIOTalonFX(TunerConstants.BackRight),
                                 SwerveConstants.stabilizePID,
                                 SwerveConstants.snapPID);
+
                 mGamepieceVision = new GamepieceVision(
                                 this::wasteVision,
                                 mDrive::getPose,
@@ -143,12 +142,7 @@ public class RobotContainer {
                                                 Units.inchesToMeters(2)));     
         }
 
-        public void wasteVision(Optional<Translation2d> gamepiecePoseMeters, double timestampSeconds) {
-                if(gamepiecePoseMeters.isPresent())
-                        Logger.recordOutput("Given data", gamepiecePoseMeters.get());
-                else
-                        Logger.recordOutput("Given data", new Translation2d());
-        }
+        public void wasteVision(Optional<Translation2d> gamepiecePoseMeters, double timestampSeconds) {}
 
         public void makeSimulatedRobot() {
                 driveSimulation = new SwerveDriveSimulation(SwerveConstants.driveConfig, new Pose2d(3, 3, new Rotation2d()).wpi());
@@ -157,6 +151,7 @@ public class RobotContainer {
                 mEndEffectorWrist = new EndEffectorWrist(
                                 new ServoMotorIOSim(
                                                 EndEffectorConstants.EndEffectorWristConstants.kWristServoConstants));
+
                 mEndEffectorRollers = new RollerSubsystem<EndEffectorConstants.RollerState>(
                                 EndEffectorConstants.RollerState.IDLE,
                                 "EndEffectorRollers",
@@ -167,6 +162,7 @@ public class RobotContainer {
                                 new RollerSubsystemIOSim(DCMotor.getKrakenX60(1), 1, 0.01),
                                 new RollerSubsystemIOSim(DCMotor.getKrakenX60(1), 1, 0.01),
                                 new ServoMotorIOSim(IntakeConstants.DeployConstants.kDeployServoConstants));
+
                 mElevator = new Elevator(
                                 new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants));
 
@@ -177,7 +173,12 @@ public class RobotContainer {
                                 new ModuleIOSim(driveSimulation.getModules()[2]),
                                 new ModuleIOSim(driveSimulation.getModules()[3]),
                                 SwerveConstants.simStabilizePID,
-                                SwerveConstants.simSnapPID);
+                                SwerveConstants.simSnapPID){
+                                        @Override
+                                        public void simResetWorldPose(Pose2d newPose) {
+                                            driveSimulation.setSimulationWorldPose(newPose.wpi());
+                                        }
+                                };
 
                 mVision = new Vision(
                                 mDrive::addVisionMeasurement,
@@ -201,16 +202,20 @@ public class RobotContainer {
         }
 
         public void makeEmptyRobot() {
-                mEndEffectorWrist = new EndEffectorWrist(
+                if(mEndEffectorWrist == null)
+                        mEndEffectorWrist = new EndEffectorWrist(
                                 new ServoMotorIO() {
                                 });
-                mEndEffectorRollers = new RollerSubsystem<EndEffectorConstants.RollerState>(
+
+                if(mEndEffectorRollers == null)
+                        mEndEffectorRollers = new RollerSubsystem<EndEffectorConstants.RollerState>(
                                 EndEffectorConstants.RollerState.IDLE,
                                 "EndEffectorRollers",
                                 new RollerSubsystemIO() {
                                 });
 
-                mIntake = new Intake(
+                if(mIntake == null)
+                        mIntake = new Intake(
                                 new RollerSubsystemIO() {
                                 },
                                 new RollerSubsystemIO() {
@@ -219,9 +224,12 @@ public class RobotContainer {
                                 },
                                 new ServoMotorIO() {
                                 });
-                mElevator = new Elevator(new ServoMotorIO() {
-                });
-                mDrive = new Drive(
+                
+                if(mElevator == null)
+                        mElevator = new Elevator(new ServoMotorIO() {});
+
+                if(mDrive == null)
+                        mDrive = new Drive(
                                 new GyroIO() {
                                 },
                                 new ModuleIO() {
@@ -235,7 +243,8 @@ public class RobotContainer {
                                 new SynchronousPIDF(),
                                 new SynchronousPIDF());
 
-                mVision = new Vision(
+                if(mVision == null)
+                        mVision = new Vision(
                                 mDrive::addVisionMeasurement,
                                 new VisionIO() {
                                 },
@@ -244,7 +253,8 @@ public class RobotContainer {
                                 new VisionIO() {
                                 });
 
-                mGamepieceVision = new GamepieceVision(
+                if(mGamepieceVision == null)
+                        mGamepieceVision = new GamepieceVision(
                                 this::wasteVision,
                                 mDrive::getPose,
                                 new GamepieceVisionIO() {
@@ -265,8 +275,8 @@ public class RobotContainer {
         Logger.recordOutput(
                 "FieldSimulation/Coral",
                 SimulatedArena.getInstance().getGamePiecesByType("Coral").toArray(new Pose3d[0]));
-                Logger.recordOutput(
-                        "FieldSimulation/Algae",
-                        SimulatedArena.getInstance().getGamePiecesByType("Algae").toArray(new Pose3d[0]));
+        Logger.recordOutput(
+                "FieldSimulation/Algae",
+                SimulatedArena.getInstance().getGamePiecesByType("Algae").toArray(new Pose3d[0]));
     }
 }
