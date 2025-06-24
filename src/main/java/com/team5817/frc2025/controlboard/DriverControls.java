@@ -73,9 +73,8 @@ public class DriverControls {
     }
     if (driver.leftTrigger.isBeingPressed()) {
       s.setGoal(preparedGoal);
-
-    } else
-
+    }
+    
     if (driver.rightTrigger.isBeingPressed() && !driver.POV270.isBeingPressed() && !driver.POV90.isBeingPressed()) {
       if (s.getGoalState().goal.mAlignmentType != AlignmentType.NONE)
         d.autoAlign(s.getGoalState().goal.mAlignmentType);
