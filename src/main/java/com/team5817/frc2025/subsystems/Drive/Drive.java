@@ -120,7 +120,7 @@ public class Drive extends Subsystem {
 
   @Setter
   @Accessors(prefix = "m")
-  private static AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
+  private AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
   @Setter
   private boolean autoAlignFinishedOverride = false;
 
