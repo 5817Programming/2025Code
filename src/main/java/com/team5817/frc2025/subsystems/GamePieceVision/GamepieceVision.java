@@ -86,9 +86,13 @@ public class GamepieceVision extends Subsystem {
 
   /** Returns the best gamepiece to track, currently the closest. */
   public Optional<Translation2d> getBestGamepiecePose() {
-    return recentObservations.stream()
+    try{
+      return recentObservations.stream()
         .min(Comparator.comparingDouble(obs -> obs.pose.getTranslation().norm()))
         .map(obs -> obs.pose);
+    }catch(Exception e){
+      return Optional.empty();
+    }
   }
 
   private boolean isValidGamepiecePose(Translation3d pose) {
