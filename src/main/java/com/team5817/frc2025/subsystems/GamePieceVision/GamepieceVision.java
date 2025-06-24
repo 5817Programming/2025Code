@@ -84,12 +84,29 @@ public class GamepieceVision extends Subsystem {
         .toArray(edu.wpi.first.math.geometry.Translation2d[]::new));
   }
 
+  public Optional<TrackedGamepiece> getBestObservation(){
+    try{
+      return recentObservations.stream()
+        .min(Comparator.comparingDouble(obs -> obs.pose.getTranslation().norm()));
+    }catch(Exception e){
+      return Optional.empty();
+    }
+  }
+
   /** Returns the best gamepiece to track, currently the closest. */
   public Optional<Translation2d> getBestGamepiecePose() {
     try{
-      return recentObservations.stream()
-        .min(Comparator.comparingDouble(obs -> obs.pose.getTranslation().norm()))
+      return getBestObservation()
         .map(obs -> obs.pose);
+    }catch(Exception e){
+      return Optional.empty();
+    }
+  }
+
+  public Optional<Translation2d> getBestRobotToGamepiecePose(){
+    try{
+      return getBestObservation()
+        .map(obs -> obs.pose.minus(robotPoseSupplier.getPose().getTranslation()));
     }catch(Exception e){
       return Optional.empty();
     }

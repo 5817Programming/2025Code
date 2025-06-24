@@ -33,7 +33,7 @@ public class GamepieceVisionIOSim implements GamepieceVisionIO {
 
     List<Pose3d> gamepieces = mSimulatedArena.getGamePiecesByType("Coral");
 
-    Pose3d base = new Pose3d(2, 1.283, 0, Rotation3d.kZero);
+    Pose3d base = new Pose3d(2, .583, 0, Rotation3d.kZero);
 
     Pose3d cornerBL = base;
     Pose3d cornerBR = AllianceFlipUtil.apply(base, true, false);
