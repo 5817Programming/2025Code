@@ -36,7 +36,7 @@ public class FieldLayout {
 	public static final AprilTagFieldLayout kTagMap;
 	static {
 		try {
-			kTagMap = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile); 
+			kTagMap = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025ReefscapeWelded.m_resourceFile); 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

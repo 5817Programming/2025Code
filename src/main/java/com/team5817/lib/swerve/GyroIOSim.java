@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.math.util.Units;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 import com.team254.lib.geometry.Rotation2d;
@@ -22,8 +21,7 @@ public class GyroIOSim implements GyroIO {
     public void updateInputs(GyroIOInputs inputs) {
         inputs.connected = true;
         inputs.yawPosition = new Rotation2d(gyroSimulation.getGyroReading());
-        inputs.yawVelocityRadPerSec = Units.degreesToRadians(
-                gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond));
+        inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
 
         inputs.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
         List<Rotation2d> gyroReadings = new ArrayList<>();

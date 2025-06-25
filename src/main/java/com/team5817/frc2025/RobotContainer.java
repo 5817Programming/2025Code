@@ -164,7 +164,7 @@ public class RobotContainer {
                                 new ServoMotorIOSim(IntakeConstants.DeployConstants.kDeployServoConstants));
 
                 mElevator = new Elevator(
-                                new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants));
+                                new ServoMotorIOSim(ElevatorConstants.kElevatorServoConstants, .2));
 
                 mDrive = new Drive(
                                 new GyroIOSim(driveSimulation.getGyroSimulation()),

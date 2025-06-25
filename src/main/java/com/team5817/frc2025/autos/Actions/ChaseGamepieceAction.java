@@ -25,9 +25,10 @@ public class ChaseGamepieceAction implements Action{
 
     @Override
     public void update() {
-        if(mGamepieceVision.getBestObservation().isEmpty())
+        if (mGamepieceVision.getBestGamepiecePose().isEmpty() || mGamepieceVision.getBestRobotToGamepiecePose().isEmpty())
             return;
-        mDrive.alignDrive(
+       
+            mDrive.alignDrive(
             Pose2d.fromTranslation(mGamepieceVision.getBestGamepiecePose().get())
                 .withRotation(mGamepieceVision.getBestRobotToGamepiecePose().get().direction().flip()),
             new Pose2d());

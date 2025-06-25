@@ -49,7 +49,12 @@ public class TrajectorySet {
      * @return The next trajectory.
      */
     public Trajectory next() {
-        return mTrajectorySet.remove(0);
+        try{
+            return mTrajectorySet.remove(0);
+        }catch(Exception e){
+            System.out.println("Cannot find next trajectory");
+            throw(e);
+        }
     }
 
     /**

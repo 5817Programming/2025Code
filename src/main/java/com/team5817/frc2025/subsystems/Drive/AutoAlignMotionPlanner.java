@@ -17,120 +17,88 @@ import org.littletonrobotics.junction.Logger;
  */
 public class AutoAlignMotionPlanner {
 
-  private PIDController mXController = new PIDController(4, 0, 0);
-  private PIDController mYController = new PIDController(4, 0, 0);
-  private SwerveHeadingController mThetaController;
+  private final PIDController distanceController = new PIDController(5.6, 0.0, 0.0);
+  private final SwerveHeadingController mThetaController;
 
-  boolean mAutoAlignComplete = false;
+  private boolean mAutoAlignComplete = false;
 
   private Pose2d mFieldToTargetPoint;
   private Pose2d poseDeadband;
-  private OptionalDouble mStartTime;
+  private OptionalDouble mStartTime = OptionalDouble.empty();
   private Translation2d error = new Translation2d();
 
-  /**
-   * Constructor for AutoAlignMotionPlanner.
-   */
   public AutoAlignMotionPlanner(SwerveHeadingController mThetaController) {
     this.mThetaController = mThetaController;
-
   }
 
-  /**
-   * Resets the motion planner to its initial state.
-   */
   public void reset() {
     mStartTime = OptionalDouble.of(Timer.getFPGATimestamp());
-    mXController.reset();
-    mYController.reset();
+    distanceController.reset();
     mAutoAlignComplete = false;
   }
 
-  /**
-   * Sets the target point for auto-alignment.
-   * 
-   * @param targetPoint The target point to align to.
-   */
   public void setTargetPoint(Pose2d targetPoint, Pose2d poseDeadband) {
     mFieldToTargetPoint = targetPoint;
-    mXController.reset();
-    mYController.reset();
+    distanceController.reset();
     this.poseDeadband = Pose2d.fromTranslation(poseDeadband.getTranslation()).withRotation(poseDeadband.getRotation());
+    reset();
+
     Logger.recordOutput("AutoAlign/Point", new edu.wpi.first.math.geometry.Pose2d(
         mFieldToTargetPoint.getTranslation().wpi(), mFieldToTargetPoint.getRotation().wpi()));
   }
 
-  /**
-   * Updates the motion planner with the current timestamp, pose, and velocity.
-   * 
-   * @param timestamp    The current timestamp.
-   * @param current_pose The current pose of the robot.
-   * @param current_vel  The current velocity of the robot.
-   * @return The updated chassis speeds.
-   */
   public ChassisSpeeds updateAutoAlign(double timestamp, Pose2d current_pose) {
-    Logger.recordOutput("AutoAlign/Valid Point", mFieldToTargetPoint!=null);
-
-    if(mFieldToTargetPoint==null)
+    Logger.recordOutput("AutoAlign/Valid Point", mFieldToTargetPoint != null);
+    if (mFieldToTargetPoint == null) {
       return new ChassisSpeeds();
-    
-    mXController.setSetpoint(mFieldToTargetPoint.getTranslation().x());
-    mYController.setSetpoint(mFieldToTargetPoint.getTranslation().y());
+    }
+
+    Translation2d translationError = mFieldToTargetPoint.getTranslation().minus(current_pose.getTranslation());
+    this.error = translationError;
+    double distanceError = translationError.norm();
+    distanceController.setSetpoint(0.0);
+    double driveSpeed = distanceController.calculate(distanceError);
+
+    driveSpeed = Math.copySign(Math.min(Math.abs(driveSpeed), 2), driveSpeed);
+
+    Translation2d driveVector = distanceError > 1e-4
+        ? translationError.direction().flip().toTranslation().times(driveSpeed)
+        : new Translation2d();
 
     mThetaController.setSnapTarget(mFieldToTargetPoint.getRotation());
-    double currentRotation = current_pose.getRotation().getRadians();
-
-    if (mFieldToTargetPoint.getRotation().getRadians() - currentRotation > Math.PI) {
-      currentRotation += 2 * Math.PI;
-    } else if (mFieldToTargetPoint.getRotation().getRadians() - currentRotation < -Math.PI) {
-      currentRotation -= 2 * Math.PI;
-    }
-    double xOutput = mXController.calculate(current_pose.getTranslation().x());
-    double yOutput = mYController.calculate(current_pose.getTranslation().y());
     double thetaOutput = mThetaController.update(current_pose.getRotation(), timestamp);
-    ChassisSpeeds setpoint = new ChassisSpeeds();
-    xOutput = Math.copySign(Math.min(Math.abs(xOutput), 1.3), xOutput);
-    yOutput = Math.copySign(Math.min(Math.abs(yOutput), 1.3), yOutput);
-    this.error = current_pose.minus(mFieldToTargetPoint).getTranslation();
-    boolean thetaWithinDeadband = current_pose.getRotation().distance(mFieldToTargetPoint.getRotation()) < poseDeadband
-        .getRotation().getRadians() && Math.abs(thetaOutput) < 0.02;
-    boolean xWithinDeadband = Math.abs(mXController.getSetpoint() - current_pose.getTranslation().x()) < poseDeadband
-        .getTranslation().x();
-    boolean yWithinDeadband = Math.abs(mYController.getSetpoint() - current_pose.getTranslation().y()) < poseDeadband
-        .getTranslation().y();
-    setpoint = ChassisSpeeds.fromFieldRelativeSpeeds(
-        xWithinDeadband ? 0.0 : xOutput,
-        yWithinDeadband ? 0.0 : yOutput,
-        thetaWithinDeadband ? 0.0 : thetaOutput,
-        current_pose.getRotation());
-        if (mAutoAlignComplete)
-    setpoint = ChassisSpeeds.fromFieldRelativeSpeeds(
-        0.0,
-        0.0,
-        0.0,
-            current_pose.getRotation());
-    mAutoAlignComplete = thetaWithinDeadband && xWithinDeadband && yWithinDeadband;
-    Logger.recordOutput("AutoAlign/xDone", xWithinDeadband);
-    Logger.recordOutput("AutoAlign/yDone", yWithinDeadband);
-    Logger.recordOutput("AutoAlign/tDone", thetaWithinDeadband);
+
+    boolean translationWithinDeadband = distanceError < poseDeadband.getTranslation().norm();
+    boolean rotationWithinDeadband =
+        current_pose.getRotation().distance(mFieldToTargetPoint.getRotation()) < poseDeadband.getRotation().getRadians()
+        && Math.abs(thetaOutput) < 0.02;
+
+    if (mAutoAlignComplete) {
+      return ChassisSpeeds.fromFieldRelativeSpeeds(0.0, 0.0, 0.0, current_pose.getRotation());
+    } 
+
+    mAutoAlignComplete = translationWithinDeadband && rotationWithinDeadband;
+
+    Logger.recordOutput("AutoAlign/TranslationDone", translationWithinDeadband);
+    Logger.recordOutput("AutoAlign/RotationDone", rotationWithinDeadband);
 
     if (mStartTime.isPresent() && mAutoAlignComplete) {
       System.out.println("Auto align took: " + (Timer.getFPGATimestamp() - mStartTime.getAsDouble()));
       mStartTime = OptionalDouble.empty();
     }
-    return setpoint;
+
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        translationWithinDeadband ? 0.0 : driveVector.x(),
+        translationWithinDeadband ? 0.0 : driveVector.y(),
+        rotationWithinDeadband ? 0.0 : thetaOutput,
+        current_pose.getRotation());
   }
 
-  /**
-   * Checks if the auto-alignment is complete.
-   * 
-   * @return True if auto-alignment is complete, false otherwise.
-   */
   public boolean getAutoAlignComplete() {
     return mAutoAlignComplete;
   }
 
   public Translation2d getAutoAlignError() {
-    return this.error;
+    return error;
   }
 }

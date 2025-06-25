@@ -1,5 +1,7 @@
 package com.team5817.lib.swerve;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.SynchronousPIDF;
 
@@ -17,7 +19,7 @@ public class SwerveHeadingController {
     SNAP,
     STABILIZE
   }
-
+  @AutoLogOutput(key = "Drive/HeadingController State")
   @Getter
   @Setter
   @Accessors(prefix = "m")

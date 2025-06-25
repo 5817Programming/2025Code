@@ -104,9 +104,7 @@ public class Drive extends Subsystem {
 
   private DriveControlState mControlState = DriveControlState.OPEN_LOOP;
   private boolean mControlStateHasChanged = false;
-
   private double alignmentStartTimestamp = 0;
-
   private final DriveMotionPlanner mMotionPlanner;
   private final AutoAlignMotionPlanner mAutoAlignMotionPlanner;
 
@@ -144,30 +142,34 @@ public class Drive extends Subsystem {
   private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation.wpi(),
       lastModulePositions, new Pose2d().wpi());
 
-  public Drive(
-      GyroIO gyroIO,
-      ModuleIO flModuleIO,
-      ModuleIO frModuleIO,
-      ModuleIO blModuleIO,
-      ModuleIO brModuleIO,
-      SynchronousPIDF stabilizePID,
-      SynchronousPIDF snapPID) {
-    this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
-    modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
-    modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
-    modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
-    mMotionPlanner = new DriveMotionPlanner();
-    mHeadingController = new SwerveHeadingController(snapPID, stabilizePID);
-    mAutoAlignMotionPlanner = new AutoAlignMotionPlanner(mHeadingController);
-
-    mAutoAlignMotionPlanner.reset();
-
-    // Usage reporting for swerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
-
-    // Start odometry thread
-    PhoenixOdometryThread.getInstance().start();
+      public Drive(
+        GyroIO gyroIO,
+        ModuleIO flModuleIO,
+        ModuleIO frModuleIO,
+        ModuleIO blModuleIO,
+        ModuleIO brModuleIO,
+        SynchronousPIDF stabilizePID,
+        SynchronousPIDF snapPID
+    ) {
+        this.gyroIO = gyroIO;
+    
+        modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
+        modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
+        modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
+        modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
+    
+        mMotionPlanner = new DriveMotionPlanner();
+    
+        mHeadingController = new SwerveHeadingController(snapPID, stabilizePID);
+    
+        mAutoAlignMotionPlanner = new AutoAlignMotionPlanner( new SwerveHeadingController(snapPID, stabilizePID));
+        mAutoAlignMotionPlanner.reset();
+    
+        // Usage reporting for swerve template
+        HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
+    
+        // Start odometry thread
+        PhoenixOdometryThread.getInstance().start();
 
     // // Configure SysId
     // sysId = new SysIdRoutine(
@@ -196,62 +198,73 @@ public class Drive extends Subsystem {
     runVelocity(getTeleopSetpoint(speeds));
   }
 
+  private boolean isStabilizing = true;
+
   private ChassisSpeeds getTeleopSetpoint(ChassisSpeeds speeds) {
+    double timestamp = Timer.getTimestamp();
 
-    double omega = mHeadingController.update(getHeading(), Timer.getTimestamp());
-
-    if (mControlState != DriveControlState.HEADING_SNAP
-        && Math.abs(speeds.omegaRadiansPerSecond) > .2) {
+    boolean userSlowingDown = Math.abs(speeds.omegaRadiansPerSecond) < 0.15;
+    boolean robotRotatingSlowly = Math.abs(gyroInputs.yawVelocityRadPerSec) < 0.3;
+    
+    if (!isStabilizing && userSlowingDown && robotRotatingSlowly) {
       mHeadingController.setStabilizeTarget(getHeading());
+      isStabilizing = true;
     }
-
-    if (mControlState == DriveControlState.PATH_FOLLOWING) {
-      if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > SwerveConstants.maxSpeed
-          * 0.1) {
-        // setControlState(DriveControlState.OPEN_LOOP);
-
-      } else {
-        mControlStateHasChanged = false;
-        return new ChassisSpeeds();
-      }
+    
+    if (!userSlowingDown) {
+      isStabilizing = false;
     }
-    if (mControlState == DriveControlState.AUTOALIGN) {
-      if (mControlStateHasChanged)
-        alignmentStartTimestamp = Timer.getTimestamp();
-      if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > SwerveConstants.maxSpeed
-          * 0.1 && Timer.getTimestamp() - alignmentStartTimestamp > .5) {
+    
+    double omega = isStabilizing
+        ? mHeadingController.update(getHeading(), timestamp)
+        : 0.0;
+    
+    switch (mControlState) {
+      case PATH_FOLLOWING:
+        if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) <= SwerveConstants.maxSpeed * 0.1) {
+          mControlStateHasChanged = false;
+          return new ChassisSpeeds();
+        }
+        break;
+    
+      case AUTOALIGN:
+        if (mControlStateHasChanged) {
+          alignmentStartTimestamp = timestamp;
+        }
+        boolean movingFast = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > SwerveConstants.maxSpeed * 0.1;
+        boolean timeoutPassed = timestamp - alignmentStartTimestamp > 0.5;
+        if (movingFast && timeoutPassed) {
+          mControlStateHasChanged = false;
+          setControlState(DriveControlState.OPEN_LOOP);
+          return speeds;
+        }
+        ChassisSpeeds alignSpeeds = mAutoAlignMotionPlanner.updateAutoAlign(timestamp, getPose());
         mControlStateHasChanged = false;
-        return speeds;
-      } else {
-        ChassisSpeeds speed = mAutoAlignMotionPlanner.updateAutoAlign(Timer.getTimestamp(), getPose());
-        if (speed != null) {
-          return speed;
+        return alignSpeeds != null ? alignSpeeds : new ChassisSpeeds();
+    
+      case OPEN_LOOP:
+      case HEADING_SNAP:
+        if (Math.abs(speeds.omegaRadiansPerSecond) > 0.1) {
+          omega = speeds.omegaRadiansPerSecond;
+        }
+        if (Math.abs(omega) < 0.05) {
+          omega = 0.0;
         }
         mControlStateHasChanged = false;
-        return new ChassisSpeeds();
-      }
+        return new ChassisSpeeds(
+            speeds.vxMetersPerSecond,
+            speeds.vyMetersPerSecond,
+            omega
+        );
+    
+      default:
+        setControlState(DriveControlState.OPEN_LOOP);
+        break;
     }
-
-    if (mControlState == DriveControlState.OPEN_LOOP || mControlState == DriveControlState.HEADING_SNAP) {
-      double x = speeds.vxMetersPerSecond;
-      double y = speeds.vyMetersPerSecond;
-
-      if (Math.abs(speeds.omegaRadiansPerSecond) > .1) {
-        omega = speeds.omegaRadiansPerSecond;
-
-      }
-
-      if (Math.abs(omega) < .05) {
-        omega = 0;
-      }
-      mControlStateHasChanged = false;
-      return new ChassisSpeeds(x, y, omega);
-    } else if (mControlState != DriveControlState.OPEN_LOOP) {
-      setControlState(DriveControlState.OPEN_LOOP);
-    }
-
+    
     mControlStateHasChanged = false;
     return speeds;
+    
   }
 
   public void autoAlign(AlignmentType type) {

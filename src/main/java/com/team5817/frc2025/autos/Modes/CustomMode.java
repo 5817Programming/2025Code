@@ -2,6 +2,8 @@ package com.team5817.frc2025.autos.Modes;
 
 import java.util.List;
 
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.team254.lib.geometry.Pose2d;
 import com.team5817.frc2025.autos.AutoBase;
 import com.team5817.frc2025.autos.AutoConstants;
 import com.team5817.frc2025.autos.AutoModeFactory.PickupLocation;
@@ -16,6 +18,7 @@ import com.team5817.frc2025.autos.Actions.TrackingTrajectoryAction;
 import com.team5817.frc2025.autos.Actions.WaitAction;
 import com.team5817.frc2025.autos.Actions.WaitForSuperstructureAction;
 import com.team5817.frc2025.autos.Actions.WaitToPassDistanceToReef;
+import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.subsystems.Superstructure;
 import com.team5817.frc2025.subsystems.Superstructure.GoalState;
 import com.team5817.frc2025.subsystems.Drive.Drive;
@@ -24,6 +27,7 @@ import com.team5817.lib.motion.Trajectory;
 import com.team5817.lib.motion.TrajectorySet;
 
 import com.team5817.frc2025.autos.Actions.Action;
+import com.team5817.frc2025.autos.Actions.AutoAlignAction;
 import com.team5817.frc2025.autos.Actions.EmptyAction;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -89,6 +93,8 @@ public class CustomMode extends AutoBase {
     this.firstPickup = firstPickup;
     this.secondPickup = secondPickup;
     this.thirdPickup = thirdPickup;
+
+    this.coral_amount = scoreAmount;
 
     t = new TrajectorySet(
         mirror,
@@ -156,41 +162,53 @@ public class CustomMode extends AutoBase {
     r(new WaitAction(AutoConstants.intakeWait));
   }
 
+ 
   public void nextScoreWhenReady(String scoreName){
     s.setReadyToScore(false);
-    r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), AutoConstants.scoreTimeout, d),
-        new SequentialAction(List.of(
-            new WaitToPassDistanceToReef(AutoConstants.enterDistance, d),
-            new LambdaAction(() -> {
-              s.setGoal(GoalState.L4);
-            }))))));
-    r(new WaitAction(AutoConstants.alignWait));
+   
+    PathPlannerTrajectory traj = t.next().get().trajectory();
+    edu.wpi.first.math.geometry.Pose2d pathPoses = traj.sample(traj.getTotalTimeSeconds()).pose;
+    Pose2d targetPose = new Pose2d(pathPoses);
 
+    r(new ParallelAction(List.of(
+        new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance),
+        new SequentialAction(List.of(
+            new WaitAction(AutoConstants.enterWait),
+            new LambdaAction(() -> s.setGoal(GoalState.L4))
+        ))
+    )));
+
+    r(new WaitAction(AutoConstants.alignWait));
     System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
     r(new WaitForSuperstructureAction(s));
     r(new WaitAction(AutoConstants.coralSpit));
+    
     System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
-  }
+}
 
-  public void nextScore(String scoreName){
+
+  
+public void nextScore(String scoreName){
     s.setReadyToScore(false);
-    r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), AutoConstants.scoreTimeout, d),
-        new SequentialAction(List.of(
-            new LambdaAction(() -> {
-              s.setGoal(GoalState.L4);
-            }))))));
+    s.setGoal(GoalState.L4);
 
+    PathPlannerTrajectory traj = t.next().get().trajectory();
+    edu.wpi.first.math.geometry.Pose2d pathPoses = traj.sample(traj.getTotalTimeSeconds()).pose;
+    Pose2d targetPose = new Pose2d(pathPoses);
+
+
+    r(new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance));
     r(new WaitAction(AutoConstants.alignWait));
+
     System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
 
     r(new WaitForSuperstructureAction(s));
     r(new WaitAction(AutoConstants.coralSpit));
-
     System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
-  }
+}
+
+
 }
