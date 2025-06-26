@@ -288,6 +288,7 @@ public class Drive extends Subsystem {
       return;
     }
     mAutoAlignMotionPlanner.setTargetPoint(targetPoint, tolerance);
+
     if (mControlState != DriveControlState.AUTOALIGN) {
       mAutoAlignMotionPlanner.reset();
       setControlState(DriveControlState.AUTOALIGN);

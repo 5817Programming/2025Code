@@ -26,14 +26,14 @@ public class AutoAlignAction implements Action{
     }
 
     @Override
-    public void update() {
-        mDrive.alignDrive(targetPose, tolerance);
-    }
+    public void update() {}
 
     @Override
     public void done() {}
 
     @Override
-    public void start() {}
+    public void start() {
+        mDrive.alignDrive(targetPose, tolerance);
+    }
     
 }

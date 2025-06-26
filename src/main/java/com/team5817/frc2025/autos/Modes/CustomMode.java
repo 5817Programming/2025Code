@@ -114,25 +114,21 @@ public class CustomMode extends AutoBase {
     s.mElevator.setManualOffset(0.04);
     d.simResetWorldPose(t.initalPose());
     
-    nextScore(firstScoreName);
+    nextScore(firstScoreName,false);
 
     if (coral_amount == 1)
     return;
 
     nextIntake(firstPickup);
 
-    System.out.println("Auto: Collected 1st coral" + " at " + (Timer.getTimestamp() - startTime));
-    
-    nextScoreWhenReady(secondScoreName);
+    nextScore(secondScoreName, true);
 
     if (coral_amount == 2)
       return;
 
     nextIntake(secondPickup);
 
-    System.out.println("Auto: Collected 2nd coral" + " at " + (Timer.getTimestamp() - startTime));
-
-    nextScoreWhenReady(thirdScoreName);
+    nextScore(thirdScoreName, true);
     
     nextIntake(thirdPickup);
   }
@@ -148,7 +144,7 @@ public class CustomMode extends AutoBase {
         trajectoryAction = new TrajectoryAction(t.next(), AutoConstants.intakeTimeout, d);
         break;
       default:
-        System.out.println("Invalid Intake State");
+        System.out.println("Auto: Invalid Intake State");
         break;
     }
 
@@ -159,56 +155,36 @@ public class CustomMode extends AutoBase {
           new LambdaAction(() -> {
             s.setGoal(pickup.state);
           }))))));
+
     r(new WaitAction(AutoConstants.intakeWait));
+
+    System.out.println("Auto: Collected coral at " + (Timer.getTimestamp() - startTime));
   }
-
- 
-  public void nextScoreWhenReady(String scoreName){
-    s.setReadyToScore(false);
-   
-    PathPlannerTrajectory traj = t.next().get().trajectory();
-    edu.wpi.first.math.geometry.Pose2d pathPoses = traj.sample(traj.getTotalTimeSeconds()).pose;
-    Pose2d targetPose = new Pose2d(pathPoses);
-
-    r(new ParallelAction(List.of(
-        new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance),
-        new SequentialAction(List.of(
-            new WaitAction(AutoConstants.enterWait),
-            new LambdaAction(() -> s.setGoal(GoalState.L4))
-        ))
-    )));
-
-    r(new WaitAction(AutoConstants.alignWait));
-    System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
-    s.setReadyToScore(true);
-    r(new WaitForSuperstructureAction(s));
-    r(new WaitAction(AutoConstants.coralSpit));
-    
-    System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
-    s.setReadyToScore(true);
-}
-
-
   
-public void nextScore(String scoreName){
-    s.setReadyToScore(false);
-    s.setGoal(GoalState.L4);
+public void nextScore(String scoreName, boolean waitForIndex){
+  s.setReadyToScore(false);
+   
+  PathPlannerTrajectory traj = t.next().get().trajectory();
+  edu.wpi.first.math.geometry.Pose2d pathPoses = traj.sample(traj.getTotalTimeSeconds()).pose;
+  Pose2d targetPose = new Pose2d(pathPoses);
 
-    PathPlannerTrajectory traj = t.next().get().trajectory();
-    edu.wpi.first.math.geometry.Pose2d pathPoses = traj.sample(traj.getTotalTimeSeconds()).pose;
-    Pose2d targetPose = new Pose2d(pathPoses);
+  r(new ParallelAction(List.of(
+      new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance),
+      new SequentialAction(List.of(
+          new WaitAction(waitForIndex? AutoConstants.enterWait : 0),
+          new LambdaAction(() -> s.setGoal(GoalState.L4))
+      ))
+  )));
 
+  r(new WaitAction(AutoConstants.alignWait));
 
-    r(new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance));
-    r(new WaitAction(AutoConstants.alignWait));
-
-    System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
-    s.setReadyToScore(true);
-
-    r(new WaitForSuperstructureAction(s));
-    r(new WaitAction(AutoConstants.coralSpit));
-    System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
+  System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
+  
+  s.setReadyToScore(true);
+  r(new WaitForSuperstructureAction(s));
+  r(new WaitAction(AutoConstants.coralSpit));
+  
+  System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
+  s.setReadyToScore(true);
 }
-
-
 }

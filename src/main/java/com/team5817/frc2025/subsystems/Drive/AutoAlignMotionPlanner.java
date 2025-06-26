@@ -41,14 +41,9 @@ public class AutoAlignMotionPlanner {
     mFieldToTargetPoint = targetPoint;
     distanceController.reset();
     this.poseDeadband = Pose2d.fromTranslation(poseDeadband.getTranslation()).withRotation(poseDeadband.getRotation());
-    reset();
-
-    Logger.recordOutput("AutoAlign/Point", new edu.wpi.first.math.geometry.Pose2d(
-        mFieldToTargetPoint.getTranslation().wpi(), mFieldToTargetPoint.getRotation().wpi()));
   }
 
   public ChassisSpeeds updateAutoAlign(double timestamp, Pose2d current_pose) {
-    Logger.recordOutput("AutoAlign/Valid Point", mFieldToTargetPoint != null);
     if (mFieldToTargetPoint == null) {
       return new ChassisSpeeds();
     }

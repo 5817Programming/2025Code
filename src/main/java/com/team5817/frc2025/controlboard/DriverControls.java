@@ -83,9 +83,12 @@ public class DriverControls {
     }
     if (driver.POV270.isBeingPressed())
       d.autoAlign(AlignmentType.CORAL_SCORE_LEFT);
+    else
+      d.setAutoAlignFinishedOverride(true);
     if (driver.POV90.isBeingPressed())
       d.autoAlign(AlignmentType.CORAL_SCORE_RIGHT);
-
+    else
+      d.setAutoAlignFinishedOverride(true);
     if (driver.getAButton()) {
       s.setGoal(GoalState.A2);
     }
