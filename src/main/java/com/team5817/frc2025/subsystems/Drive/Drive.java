@@ -221,8 +221,8 @@ public class Drive extends Subsystem {
     
     switch (mControlState) {
       case PATH_FOLLOWING:
-        if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) <= SwerveConstants.maxSpeed * 0.1) {
-          mControlStateHasChanged = false;
+        if (Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) <= TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.1) {
+        mControlStateHasChanged = false;
           return new ChassisSpeeds();
         }
         break;
@@ -231,7 +231,7 @@ public class Drive extends Subsystem {
         if (mControlStateHasChanged) {
           alignmentStartTimestamp = timestamp;
         }
-        boolean movingFast = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > SwerveConstants.maxSpeed * 0.1;
+        boolean movingFast = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) > TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.1;
         boolean timeoutPassed = timestamp - alignmentStartTimestamp > 0.5;
         if (movingFast && timeoutPassed) {
           mControlStateHasChanged = false;

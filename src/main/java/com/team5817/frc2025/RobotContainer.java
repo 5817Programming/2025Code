@@ -117,13 +117,7 @@ public class RobotContainer {
                                 new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
 
                 mElevator = new Elevator(new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
-
-                mVision = new Vision(
-                                mDrive::addVisionMeasurement,
-                                new VisionIOLimelight("limelight-up", mDrive::getHeading),
-                                new VisionIOLimelight("limelight-left", mDrive::getHeading),
-                                new VisionIOLimelight("limelight-right", mDrive::getHeading));
-
+                
                 mDrive = new Drive(
                                 new GyroIOPigeon2(),
                                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
@@ -132,6 +126,13 @@ public class RobotContainer {
                                 new ModuleIOTalonFX(TunerConstants.BackRight),
                                 SwerveConstants.stabilizePID,
                                 SwerveConstants.snapPID);
+
+                mVision = new Vision(
+                                mDrive::addVisionMeasurement,
+                                // new VisionIOLimelight("limelight-up", mDrive::getHeading),
+                                new VisionIOLimelight("limelight-left", mDrive::getHeading),
+                                new VisionIOLimelight("limelight-right", mDrive::getHeading));
+
 
                 mGamepieceVision = new GamepieceVision(
                                 this::wasteVision,
