@@ -25,6 +25,7 @@ import com.team5817.frc2025.controlboard.DriverControls;
 import com.team5817.frc2025.subsystems.Drive.Drive;
 import com.team5817.lib.Elastic;
 import com.team5817.lib.Util;
+import com.team5817.lib.vision.LimelightPoseCalibrator;
 import com.team5817.lib.RobotMode;
 
 import edu.wpi.first.net.PortForwarder;
@@ -204,15 +205,28 @@ public class Robot extends LoggedRobot {
     }
   }
 
+
+  LimelightPoseCalibrator mLeftLimelightPoseCalibrator;
+  LimelightPoseCalibrator mRightLimelightPoseCalibrator;
+  LimelightPoseCalibrator mUpLimelightPoseCalibrator;
   /**
    * This method is called once each time the robot enters test mode.
    */
   @Override
   public void testInit() {
-    Elastic.selectTab("Systems Test");
+    mLeftLimelightPoseCalibrator = new LimelightPoseCalibrator("leftLimelightCalibration.json");
+    mRightLimelightPoseCalibrator = new LimelightPoseCalibrator("rightLimelightCalibration.json");
+    mUpLimelightPoseCalibrator = new LimelightPoseCalibrator("upLimelightCalibration.json");
 
-    mAutoExecuter.setAuto(new Characterize(mRobotContainer.mElevator, true));
-    mAutoExecuter.start();
+    mLeftLimelightPoseCalibrator.start();
+    mRightLimelightPoseCalibrator.start();
+    mUpLimelightPoseCalibrator.start();
+    // Elastic.selectTab("Systems Test");
+
+    // mAutoExecuter.setAuto(new Characterize(mRobotContainer.mElevator, true));
+    // mAutoExecuter.start();
+
+
   }
 
   /**
@@ -220,8 +234,12 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void testPeriodic() {
-    mRobotContainer.mElevator.writePeriodicOutputs();
-    mRobotContainer.mElevator.outputTelemetry();
+    // mRobotContainer.mElevator.writePeriodicOutputs();
+    // mRobotContainer.mElevator.outputTelemetry();
+
+    mLeftLimelightPoseCalibrator.update();
+    mRightLimelightPoseCalibrator.update();
+    mUpLimelightPoseCalibrator.update();
   }
 
   /**
