@@ -35,4 +35,6 @@ public interface VisionIO {
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
+  public default void stop() {}
+  public default void start() {}
 }

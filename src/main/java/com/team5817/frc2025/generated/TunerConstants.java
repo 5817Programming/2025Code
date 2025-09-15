@@ -88,8 +88,8 @@ public class TunerConstants {
   private static final Distance kWheelRadius = Inches.of(2.0);
 
   // Inversion settings for drivetrain sides
-  private static final boolean kInvertLeftSide = true;//TODO flip these back if the robot drives wrong
-  private static final boolean kInvertRightSide = false;//TODO flip these back if the robot drives wrong
+  private static final boolean kInvertLeftSide = false;//TODO flip these back if the robot drives wrong
+  private static final boolean kInvertRightSide = true;//TODO flip these back if the robot drives wrong
 
   // CAN ID for the Pigeon 2
   private static final int kPigeonId = 23;

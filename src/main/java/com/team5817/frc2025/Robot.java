@@ -106,15 +106,14 @@ public class Robot extends LoggedRobot {
     controls = new DriverControls(mDrive, mRobotContainer.mSuperstructure);
     controlBoard = controls.mControlBoard;
 
-    mSubsystemManager.start();
     Logger.recordOutput("isComp", RobotConstants.isComp);
   }
-
+  
   /**
    * This method is called periodically, regardless of the robot's mode.
    */
   boolean needsZero = true;
-
+  
   @Override
   public void robotPeriodic() {
     if (needsZero && DriverStation.getAlliance().isPresent()) {
@@ -133,6 +132,8 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
+    if(neverEnabled)
+      mSubsystemManager.start();
     neverEnabled = false;
     Elastic.selectTab("Autonomous");
     mAutoExecuter.start();
@@ -143,14 +144,16 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {
 
   }
-
+  
   boolean neverEnabled = true;
-
+  
   /**
    * This method is called once each time the robot enters teleoperated mode.
    */
   @Override
   public void teleopInit() {
+    if(neverEnabled)
+      mSubsystemManager.start();
     mRobotContainer.mEndEffectorWrist.setManualOffset(0);
     mRobotContainer.mElevator.setManualOffset(0);
     neverEnabled = false;

@@ -64,8 +64,6 @@ public class DriverControls {
   public void twoControllerMode() {
     if (driver.getStartButton())
       d.zeroGyro(Util.isRed().get() ? 0 : 180);
-    if (driver.getBackButton())
-      d.zeroGyro(Util.isRed().get() ? 180 : 0);
 
     // if(driver.\)sswaaaaaa
     if (driver.leftBumper.isBeingPressed()) {
@@ -147,7 +145,7 @@ public class DriverControls {
 
     if (codriver.xButton.isBeingPressed())
       preparedGoal = GoalState.L1;
-    if (codriver.POV0.isBeingPressed()) {
+    if (codriver.POV0.isBeingPressed()) {//TODO make it Not whip the coral in until it is clear of the upper ele tube
       preparedGoal = GoalState.NET;
     }
     if (codriver.POV180.isBeingPressed()) {

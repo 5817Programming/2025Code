@@ -40,7 +40,7 @@ public class AlignmentPoint {
             this.tolerance = tolerance;
         }
         private AlignmentType(){
-            this.tolerance = new Pose2d(.04, 0.04, 3);
+            this.tolerance = new Pose2d(.02, 0.04, 3);
         }
     }
 

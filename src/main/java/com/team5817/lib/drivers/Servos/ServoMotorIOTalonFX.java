@@ -90,10 +90,10 @@ public class ServoMotorIOTalonFX implements ServoMotorIO {
     mMainConfig.Feedback.SensorToMechanismRatio = (mConstants.kMainConstants.invert_sensor_phase ? -1 : 1);
 
     mMainConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = mForwardSoftLimitRotations;
-    mMainConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    mMainConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable =  false;//TODO Set to true and fix the value
 
     mMainConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = mReverseSoftLimitRotations;
-    mMainConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    mMainConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
     mMainConfig.Slot0.kP = mConstants.kKp;
     mMainConfig.Slot0.kI = mConstants.kKi;

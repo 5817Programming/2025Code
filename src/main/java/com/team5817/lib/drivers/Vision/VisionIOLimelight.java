@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.team254.lib.geometry.Rotation2d;
+import com.team5817.lib.vision.LimelightHelpers;
 
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
@@ -26,7 +27,7 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleSubscriber tySubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
-
+  private final String kName;
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -41,8 +42,10 @@ public class VisionIOLimelight implements VisionIO {
     txSubscriber = table.getDoubleTopic("tx").subscribe(0.0);
     tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
     megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
+    LimelightHelpers.setPipelineIndex(name, 0);
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    kName = name;
   }
 
   @Override
@@ -140,5 +143,13 @@ public class VisionIOLimelight implements VisionIO {
             Units.degreesToRadians(rawLLArray[3]),
             Units.degreesToRadians(rawLLArray[4]),
             Units.degreesToRadians(rawLLArray[5])));
+  }
+  @Override
+  public void stop(){
+    LimelightHelpers.setPipelineIndex(kName, 1);
+  } 
+  @Override
+  public void start() {
+    LimelightHelpers.setPipelineIndex(kName, 0);
   }
 }

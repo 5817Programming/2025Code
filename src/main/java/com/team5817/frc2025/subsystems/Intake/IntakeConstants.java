@@ -18,7 +18,7 @@ public class IntakeConstants {
 
     static {
 
-      kDeployServoConstants.kName = "Deploy";
+      kDeployServoConstants.kName = "Intake/Deploy";
 
       kDeployServoConstants.kMainConstants.id = Ports.INTAKE_PIVOT;
       kDeployServoConstants.kMainConstants.counterClockwisePositive = false;
@@ -72,8 +72,8 @@ public class IntakeConstants {
 
     public enum FeederState implements IRollerState {
       IDLE(0),
-      INTAKING(10),
-      EXHAUST(-6);
+      INTAKING(-10),
+      EXHAUST(6);
 
       @Getter
       private final double demand;

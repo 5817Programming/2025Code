@@ -114,10 +114,10 @@ public class RobotContainer {
                                                 IntakeConstants.RollerConstants.motorConstants, 1),
                                 new RollerSubsystemIOTalonFX(Ports.BOTTOM_INDEXER,
                                                 IntakeConstants.RollerConstants.motorConstants, 1),
-                                new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
+                                new ServoMotorIOTalonFX(IntakeConstants.DeployConstants.kDeployServoConstants));
 
                 mElevator = new Elevator(new ServoMotorIOTalonFX(ElevatorConstants.kElevatorServoConstants));
-                
+
                 mDrive = new Drive(
                                 new GyroIOPigeon2(),
                                 new ModuleIOTalonFX(TunerConstants.FrontLeft),

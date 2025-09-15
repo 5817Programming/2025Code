@@ -73,8 +73,8 @@ public class Intake extends Subsystem {
 
   @Override
   public void outputTelemetry() {
-    Logger.recordOutput("Intake/State", mState);
-    Logger.recordOutput("Intake/AtState", stateRequest(mState).isFinished());
+    mIntakeDeploy.outputTelemetry();
+    mIntakeRollers.outputTelemetry();
   }
 
   public void conformToState(State state) {

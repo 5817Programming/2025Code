@@ -63,6 +63,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 public class Drive extends Subsystem {
+  boolean resetHeadingController = false;
   // TunerConstants doesn't include these constants, so they are declared locally
   public static final double ODOMETRY_FREQUENCY = new CANBus(TunerConstants.DrivetrainConstants.CANBusName)
       .isNetworkFD() ? 250.0 : 100.0;
@@ -206,10 +207,12 @@ public class Drive extends Subsystem {
     boolean userSlowingDown = Math.abs(speeds.omegaRadiansPerSecond) < 0.15;
     boolean robotRotatingSlowly = Math.abs(gyroInputs.yawVelocityRadPerSec) < 0.3;
     
-    if (!isStabilizing && userSlowingDown && robotRotatingSlowly) {
+    if (!isStabilizing && userSlowingDown && robotRotatingSlowly && !resetHeadingController) {
       mHeadingController.setStabilizeTarget(getHeading());
       isStabilizing = true;
+      resetHeadingController = false;
     }
+    Logger.recordOutput("Drive/TargetHeading", mHeadingController.getTargetHeading().getDegrees());
     
     if (!userSlowingDown) {
       isStabilizing = false;
@@ -556,6 +559,8 @@ public class Drive extends Subsystem {
   }
 
   public void zeroGyro(double newHeading) {
+    mHeadingController.setStabilizeTarget(Rotation2d.fromDegrees(newHeading));
+    resetHeadingController = true;
     gyroIO.resetYaw(Rotation2d.fromDegrees(newHeading));
   }
 

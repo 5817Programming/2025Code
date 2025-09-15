@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class AutoAlignMotionPlanner {
 
-  private final PIDController distanceController = new PIDController(5.6, 0.0, 0.0);
+  private final PIDController distanceController = new PIDController(17, 0.0, 0.0);
   private final SwerveHeadingController mThetaController;
 
   private boolean mAutoAlignComplete = false;
@@ -58,7 +58,7 @@ public class AutoAlignMotionPlanner {
     distanceController.setSetpoint(0.0);
     double driveSpeed = distanceController.calculate(distanceError);
 
-    driveSpeed = Math.copySign(Math.min(Math.abs(driveSpeed), 2), driveSpeed);
+    driveSpeed = Math.copySign(Math.min(Math.abs(driveSpeed), 4), driveSpeed);
 
     Translation2d driveVector = distanceError > 1e-4
         ? translationError.direction().flip().toTranslation().times(driveSpeed)

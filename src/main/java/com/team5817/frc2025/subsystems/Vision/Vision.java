@@ -185,4 +185,16 @@ public class Vision extends Subsystem {
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
   }
+  @Override
+  public void stop() {
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      io[cameraIndex].stop();
+    }
+  }
+  @Override
+  public void start() {
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      io[cameraIndex].start();
+    }
+  }
 }

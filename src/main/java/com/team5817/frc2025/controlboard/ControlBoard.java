@@ -85,7 +85,7 @@ public class ControlBoard {
     if (Math.abs(rotAxis) < kSwerveDeadband) {
       return 0.0;
     } else {
-      return 8
+      return 30
           * (rotAxis - (Math.signum(rotAxis) * kSwerveDeadband))
           / (1 - kSwerveDeadband);
     }

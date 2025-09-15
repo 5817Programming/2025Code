@@ -48,7 +48,7 @@ public class StateBasedServoMotorSubsystem<S extends Enum<S> & ServoState> exten
   @Override
   public void readPeriodicInputs() {
     super.readPeriodicInputs();
-    atState = Util.epsilonEquals(getPosition(), mConstants.rotationsToUnits(demand), mState.getAllowableError());
+    atState = Util.epsilonEquals(getPosition()-mConstants.kHomePosition, mConstants.rotationsToUnits(demand), mState.getAllowableError());
     if (mState.isDisabled() || mControlState != ControlState.POSITION)
       atState = true;
   }

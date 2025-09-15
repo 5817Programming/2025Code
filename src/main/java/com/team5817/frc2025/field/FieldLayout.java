@@ -43,8 +43,8 @@ public class FieldLayout {
 	}
      
         private static final AlignmentPoint kReefToCenterAlign = new AlignmentPoint(new Translation2d(-RobotConstants.kBumberSideLength/2, 0.0),AlignmentType.ALGAE_CLEAN);
-        private static final AlignmentPoint kReefToRightAlign = new AlignmentPoint(new Translation2d(-(RobotConstants.kBumberSideLength+0.3358)/2, -0.1643),AlignmentType.CORAL_SCORE,AlignmentType.CORAL_SCORE_RIGHT);
-        private static final AlignmentPoint kReefToLeftAlign = new AlignmentPoint(new Translation2d(-(RobotConstants.kBumberSideLength+0.3358)/2, 0.1643),AlignmentType.CORAL_SCORE,AlignmentType.CORAL_SCORE_LEFT);
+        private static final AlignmentPoint kReefToRightAlign = new AlignmentPoint(new Translation2d(-(RobotConstants.kBumberSideLength+0.3158)/2, -0.1643),AlignmentType.CORAL_SCORE,AlignmentType.CORAL_SCORE_RIGHT);
+        private static final AlignmentPoint kReefToLeftAlign = new AlignmentPoint(new Translation2d(-(RobotConstants.kBumberSideLength+0.3158)/2, 0.1643),AlignmentType.CORAL_SCORE,AlignmentType.CORAL_SCORE_LEFT);
 
         private static final AlignmentPoint kHumanToCenterAlign = new AlignmentPoint(new Translation2d(RobotConstants.kBumberSideLength/2, 0.0),AlignmentType.HUMAN);
         private static final AlignmentPoint kHumanToRightAlign = new AlignmentPoint(new Translation2d(RobotConstants.kBumberSideLength/2, -0.55),AlignmentType.HUMAN);

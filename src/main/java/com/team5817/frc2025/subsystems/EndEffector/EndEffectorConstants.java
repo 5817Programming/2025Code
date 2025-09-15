@@ -26,16 +26,16 @@ public class EndEffectorConstants {
 
   public enum RollerState implements IRollerState {
     IDLE(0.0),
-    HOLD(-2.0),
-    HOLDCORAL(-1.5),
-    CORAL_INTAKE(-4.0),
-    l4(12.0),
-    l3(3.0),
-    l2(8.0),
-    l1(1.5),
-    ALGAE_INTAKE(-9.0),
-    ALGAE_OUTTAKE(1.25),
-    ALGAE_SHOOT(12);
+    HOLD(9.0),
+    HOLDCORAL(1.5),
+    CORAL_INTAKE(4.0),
+    l4(-12.0),
+    l3(-3.0),
+    l2(-8.0),
+    l1(-1.5),
+    ALGAE_INTAKE(9.0),
+    ALGAE_OUTTAKE(-1.25),
+    ALGAE_SHOOT(-12);
 
     @Getter
     double demand = 0;
@@ -60,10 +60,10 @@ public class EndEffectorConstants {
       kWristServoConstants.kMainConstants.id = Ports.ENDEFFECTOR_WRIST;
       kWristServoConstants.kMainConstants.counterClockwisePositive = false;
 
-      kWristServoConstants.kHomePosition = 0; // degrees
+      kWristServoConstants.kHomePosition = -89; // degrees
       kWristServoConstants.kRotationsPerUnitDistance = (1 / 360.0) * 10;
 
-      kWristServoConstants.kMaxUnitsLimit = 200 - 89;
+      kWristServoConstants.kMaxUnitsLimit = 200-89;
       kWristServoConstants.kMinUnitsLimit = -89;
 
       kWristServoConstants.kKp = 100;
