@@ -1,5 +1,10 @@
 package com.team5817.frc2025.subsystems;
 
+import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Translation2d;
+import com.team5817.frc2025.field.FieldConstants;
+import com.team5817.frc2025.field.FieldLayout;
 import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.field.FieldConstants.ReefLevel;
 import com.team5817.frc2025.subsystems.Drive.Drive;
@@ -11,13 +16,16 @@ import com.team5817.frc2025.subsystems.EndEffector.EndEffectorWrist;
 import com.team5817.frc2025.subsystems.Intake.Intake; // Added missing import for Intake
 import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.drivers.Rollers.RollerSubsystem;
+import com.team5817.lib.requests.LambdaRequest;
 import com.team5817.lib.requests.ParallelRequest;
 import com.team5817.lib.requests.Request;
 import com.team5817.lib.requests.SequentialRequest;
 import com.team5817.lib.requests.WaitRequest;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -32,6 +40,7 @@ public class Superstructure extends Subsystem {
   private boolean hasNewRequest = false;
   private boolean allRequestsComplete = false;
   private boolean readyToScore = true;
+  private boolean autoFire = true;
   private boolean driverAllowsPoseComp = true;
 
   // Subsystems
@@ -252,6 +261,7 @@ public class Superstructure extends Subsystem {
     if (activeRequest != null)
       Logger.recordOutput("State", activeRequest.getName());
     Logger.recordOutput("Elastic/AllowedPoseComp", driverAllowsPoseComp);
+    Logger.recordOutput("AutoComplete", mDrive.getAutoAlignComplete());
   }
 
   /* Superstructure functions */
@@ -347,11 +357,29 @@ public class Superstructure extends Subsystem {
    * @param goal The goal state.
    * @return A request for scoring.
    */
-  private Request ScoreGoalRequest(SuperstructureState goal) {
+  public Request ScoreGoalRequest(SuperstructureState goal) {
     if (!(goal.mType == SuperstructureState.Type.SCORING)) {
       System.out.println("Wrong Goal Type");
     }
     return new ParallelRequest(
+        new ParallelRequest(
+            mElevator.stateRequest(goal.mElevatorState),
+            mIntake.stateRequest(goal.mIntakeState),
+            mEndEffectorRollers.stateRequest(EndEffectorConstants.RollerState.HOLDCORAL),
+            new SequentialRequest(
+                mElevator.waitToBeOverRequest(ElevatorConstants.kCoralClearHeightRanThroughFinger),
+                mEndEffectorWrist.stateRequest(goal.mEndEffectorWristState))),
+        new SequentialRequest(
+            ReadyToScoreRequest(),
+            mEndEffectorRollers.stateRequest(goal.mEndEffectorRollersState)))
+        .addName("Score");
+  }
+  public Request AutoScoreRequest(SuperstructureState goal, AlignmentType type){
+    if (!(goal.mType == SuperstructureState.Type.SCORING)) {
+      System.out.println("Wrong Goal Type");
+    }
+    return new ParallelRequest(
+        new LambdaRequest(() -> mDrive.autoAlign(type)),
         new ParallelRequest(
             mElevator.stateRequest(goal.mElevatorState),
             mIntake.stateRequest(goal.mIntakeState),
@@ -407,6 +435,9 @@ public class Superstructure extends Subsystem {
   public void setReadyToScore(boolean newReady) {
     readyToScore = newReady;
   }
+  public void setAutoFire(boolean newAutoFire) {
+    this.autoFire = newAutoFire;
+  }
 
   public void toggleAllowPoseComp() {
     driverAllowsPoseComp = !driverAllowsPoseComp;
@@ -428,5 +459,19 @@ public class Superstructure extends Subsystem {
 public boolean hasPiece() {
     return mDrive.getAutoAlignError().norm()<0.3&&DriverStation.isAutonomous();
 }
+public GoalState smartAlgaeCleanRequest(){
+      Translation2d reef = DriverStation.getAlliance().get() == Alliance.Red? new Translation2d(FieldConstants.Reef.center).mirrorAboutX(FieldLayout.kFieldLength/2): new Translation2d(FieldConstants.Reef.center);
+      Rotation2d rot = reef.minus(mDrive.getPose().getTranslation()).direction();
+      int side = (int) Math.floor((rot.getDegrees()+30)/60);
+      if (DriverStation.getAlliance().get() == Alliance.Red) side++;
+      int type = Math.floorMod(side,2);
+      Logger.recordOutput("Side", side);
+      Logger.recordOutput("Type", type);
+      if(type == 1){
+        return (GoalState.A1);
+      }else{
+        return (GoalState.A2);
+      }      
+    }
 
 }

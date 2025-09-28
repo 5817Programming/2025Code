@@ -56,6 +56,7 @@ public class DriverControls {
   double lastTime = 0;
 
   boolean wantStow = false;
+  boolean wantAStow = false;
 
   /**
    * Handles the input for the two controller mode.
@@ -72,12 +73,10 @@ public class DriverControls {
     if (driver.leftTrigger.isBeingPressed()) {
       s.setGoal(preparedGoal);
     }
-    
-    if (driver.rightTrigger.isBeingPressed() && !driver.POV270.isBeingPressed() && !driver.POV90.isBeingPressed()) {
-      if (s.getGoalState().goal.mAlignmentType != AlignmentType.NONE)
-        d.autoAlign(s.getGoalState().goal.mAlignmentType);
-      else
-        d.setAutoAlignFinishedOverride(true);
+    if(driver.rightTrigger.isBeingPressed() && preparedGoal == GoalState.NET)
+      s.setGoal(preparedGoal);
+    else if (driver.rightTrigger.isBeingPressed() && !driver.POV270.isBeingPressed() && !driver.POV90.isBeingPressed()) {
+      s.request(s.AutoScoreRequest(preparedGoal.goal,preparedGoal.goal.mAlignmentType));
     }
     if (driver.POV270.isBeingPressed())
       d.autoAlign(AlignmentType.CORAL_SCORE_LEFT);
@@ -87,12 +86,12 @@ public class DriverControls {
       d.autoAlign(AlignmentType.CORAL_SCORE_RIGHT);
     else
       d.setAutoAlignFinishedOverride(true);
-    if (driver.getAButton()) {
-      s.setGoal(GoalState.A2);
+    if (driver.aButton.wasActivated()) {
+      d.autoAlign(AlignmentType.ALGAE_CLEAN);
+      s.setGoal(s.smartAlgaeCleanRequest());
     }
-    if (driver.getXButton()) {
-      s.setGoal(GoalState.A1);
-    }
+    Logger.recordOutput("sideTe", s.smartAlgaeCleanRequest());
+
     if (driver.bButton.isBeingPressed())
       s.mEndEffectorRollers.setState(EndEffectorConstants.RollerState.CORAL_INTAKE);
     if (driver.yButton.isBeingPressed()) {
@@ -107,10 +106,13 @@ public class DriverControls {
       s.setGoal(GoalState.STOW);
       d.setControlState(DriveControlState.OPEN_LOOP);
     }
-    if (driver.releasedAny(driver.aButton, driver.xButton))
-      s.setGoal(GoalState.ASTOW);
+    if(mControlBoard.getSwerveTranslation().norm()>0.3 && d.getControlState() == DriveControlState.AUTOALIGN){
+      d.setControlState(DriveControlState.OPEN_LOOP);
+      if(d.getAlignment() == AlignmentType.ALGAE_CLEAN)
+        wantAStow = true;
+    }
 
-    if (driver.releasedAny(driver.leftTrigger) && !(driver.getAButton() || driver.getXButton())) {
+    if (driver.releasedAny(driver.leftTrigger,driver.rightTrigger) && !(driver.getAButton() || driver.getXButton())) {
       wantStow = true;
     }
     if (wantStow && clearReef()) {
@@ -119,11 +121,17 @@ public class DriverControls {
       d.setControlState(DriveControlState.OPEN_LOOP);
       wantStow = false;
     }
+    if (wantAStow && clearReef()) {
+      s.setGoal(GoalState.ASTOW);
+
+      d.setControlState(DriveControlState.OPEN_LOOP);
+      wantAStow = false;
+    }
 
     if (driver.releasedAny(driver.rightTrigger))
       d.setControlState(DriveControlState.OPEN_LOOP);
 
-    if (driver.leftTrigger.isBeingPressed())
+    if (driver.rightTrigger.isBeingPressed() || driver.leftTrigger.isBeingPressed())
       s.setReadyToScore(driver.rightBumper.isBeingPressed());
     else if (driver.rightBumper.isBeingPressed())
       s.setGoal(GoalState.EXHAUST);

@@ -103,6 +103,8 @@ public class Drive extends Subsystem {
     AUTOALIGN
   }
 
+  @Getter
+  @Accessors(prefix = "m")
   private DriveControlState mControlState = DriveControlState.OPEN_LOOP;
   private boolean mControlStateHasChanged = false;
   private double alignmentStartTimestamp = 0;
@@ -118,6 +120,7 @@ public class Drive extends Subsystem {
   private boolean mOverrideHeading = false;
 
   @Setter
+  @Getter
   @Accessors(prefix = "m")
   private AlignmentType mAlignment = AlignmentType.CORAL_SCORE;
   @Setter

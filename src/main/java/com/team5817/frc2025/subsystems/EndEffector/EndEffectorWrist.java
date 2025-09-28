@@ -33,8 +33,8 @@ public class EndEffectorWrist extends StateBasedServoMotorSubsystem<EndEffectorW
 
   public enum State implements ServoState {
 
-    L4(71.89453125 - 89   , kStrictError, EndEffectorWristConstants.kHighOffsetMap),
-    L3(-31.185546874999993, kStrictError),
+    L4(71.89453125 - 89 +3   , kStrictError, EndEffectorWristConstants.kHighOffsetMap),
+    L3(-31.185546874999993 + 2, kStrictError),
     L2(-40.185546874999993+5, kStrictError),
     L1(0 - 89, kStrictError),
     A1(180.342 - 89, kMediumError),

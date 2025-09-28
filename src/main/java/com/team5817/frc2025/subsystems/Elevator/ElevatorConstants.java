@@ -66,6 +66,7 @@ public final class ElevatorConstants {
 
   public static double kHomingZone = 0.1; // degrees
   public static final double kCoralClearHeight = 0.15; // rotations
+  public static final double kCoralClearHeightRanThroughFinger = 1.6;
   public static final InterpolatingDoubleTreeMap kMidOffsetMap = new InterpolatingDoubleTreeMap();
   static {
     kMidOffsetMap.put(-.112, -0.149804);

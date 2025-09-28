@@ -18,7 +18,7 @@ public class EndEffectorConstants {
     rollerConstants.kMaxReverseOutput = -12;
     rollerConstants.kNeutralMode = NeutralModeValue.Brake;
     rollerConstants.kSupplyCurrentLimit = 30;
-    rollerConstants.kStatorCurrentLimit = 100;
+    rollerConstants.kStatorCurrentLimit = 60;
     rollerConstants.counterClockwisePositive = false;
     rollerConstants.kEnableStatorCurrentLimit = true;
     rollerConstants.kEnableSupplyCurrentLimit = true;
@@ -34,7 +34,7 @@ public class EndEffectorConstants {
     l2(-8.0),
     l1(-1.5),
     ALGAE_INTAKE(9.0),
-    ALGAE_OUTTAKE(-1.25),
+    ALGAE_OUTTAKE(-3),
     ALGAE_SHOOT(-12);
 
     @Getter
