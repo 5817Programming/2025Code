@@ -18,7 +18,7 @@ public class EndEffectorConstants {
     rollerConstants.kMaxReverseOutput = -12;
     rollerConstants.kNeutralMode = NeutralModeValue.Brake;
     rollerConstants.kSupplyCurrentLimit = 30;
-    rollerConstants.kStatorCurrentLimit = 60;
+    rollerConstants.kStatorCurrentLimit = 100;
     rollerConstants.counterClockwisePositive = false;
     rollerConstants.kEnableStatorCurrentLimit = true;
     rollerConstants.kEnableSupplyCurrentLimit = true;

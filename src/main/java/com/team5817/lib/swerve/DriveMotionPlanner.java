@@ -75,7 +75,7 @@ public class DriveMotionPlanner {
   }
 
   public ChassisSpeeds updatePIDChassis(ChassisSpeeds chassisSpeeds) {
-    final double kPathk = 4;
+    final double kPathk = 12;
     Twist2d pid_error = Pose2d.log(mError);
     chassisSpeeds.vxMetersPerSecond = (chassisSpeeds.vxMetersPerSecond) + kPathk * pid_error.dx;
     chassisSpeeds.vyMetersPerSecond = (chassisSpeeds.vyMetersPerSecond) + kPathk * pid_error.dy;

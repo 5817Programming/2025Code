@@ -58,7 +58,6 @@ public class AutoModeFactory {
   public enum DesiredMode {
     DO_NOTHING,
     CUSTOM_MODE,
-    ONE_NET,
     TWO_NET,
     SIDE_MAIN
   }
@@ -66,7 +65,7 @@ public class AutoModeFactory {
   public enum StartingPosition {
 
     PROCCESSOR_SIDE("S", DesiredMode.CUSTOM_MODE, DesiredMode.SIDE_MAIN, DesiredMode.DO_NOTHING),
-    CENTER_PROCESS("C", DesiredMode.CUSTOM_MODE, DesiredMode.ONE_NET, DesiredMode.TWO_NET, DesiredMode.DO_NOTHING),
+    CENTER_PROCESS("C", DesiredMode.CUSTOM_MODE,  DesiredMode.TWO_NET, DesiredMode.DO_NOTHING),
     CENTER_BLANK("C", true, DesiredMode.CUSTOM_MODE, DesiredMode.DO_NOTHING),
     BLANK_SIDE("S", true, DesiredMode.CUSTOM_MODE, DesiredMode.SIDE_MAIN, DesiredMode.DO_NOTHING);
 
@@ -227,8 +226,6 @@ public class AutoModeFactory {
         return Optional.of(new CustomMode(mCachedStartingPosition, mCachedFirstPickupLocation,
             mCachedSecondPickupLocation, mCachedThirdPickupLocation, mCachedFirstScore, mCachedSecondScore,
             mCachedThirdScore, mCachedScoreAmount, s, d, g));
-      case ONE_NET:
-        return Optional.of(new Center11(mCachedStartingPosition, s, d));
       case TWO_NET:
         return Optional.of(new Center12(mCachedStartingPosition, s, d));
       case SIDE_MAIN:

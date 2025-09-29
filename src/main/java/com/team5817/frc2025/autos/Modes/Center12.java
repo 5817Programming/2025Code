@@ -2,6 +2,7 @@ package com.team5817.frc2025.autos.Modes;
 
 import java.util.List;
 
+import com.pathplanner.lib.path.GoalEndState;
 import com.team5817.frc2025.autos.AutoBase;
 import com.team5817.frc2025.autos.AutoConstants;
 import com.team5817.frc2025.autos.Actions.LambdaAction;
@@ -9,7 +10,9 @@ import com.team5817.frc2025.autos.Actions.ParallelAction;
 import com.team5817.frc2025.autos.Actions.SequentialAction;
 import com.team5817.frc2025.autos.Actions.TrajectoryAction;
 import com.team5817.frc2025.autos.Actions.WaitAction;
+import com.team5817.frc2025.autos.Actions.WaitForBooleanAction;
 import com.team5817.frc2025.autos.Actions.WaitToPassDistanceToReef;
+import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.autos.AutoModeFactory.StartingPosition;
 import com.team5817.frc2025.autos.Actions.WaitForSuperstructureAction;
 import com.team5817.frc2025.autos.TrajectoryLibrary.l;
@@ -45,28 +48,25 @@ public class Center12 extends AutoBase {
     this.d = d;
     this.s = s;
     boolean mirror = startingPosition.mirrored;
-    Trajectory c1;
     Trajectory clear1;
-    Trajectory da1;
     Trajectory n1;
-    Trajectory da2;
+    Trajectory da1;
     Trajectory n2;
+    Trajectory no;
 
-    c1 = l.trajectories.get(startingPosition.name + "To_3A");
     clear1 = l.trajectories.get("3ATo3O");
-    da1 = l.trajectories.get("3OTo3C");
     n1 = l.trajectories.get("3CToN");
-    da2 = l.trajectories.get("NTo4C");
+    da1 = l.trajectories.get("NTo4C");
     n2 = l.trajectories.get("4CToN");
+    no = l.trajectories.get("NO");
 
     t = new TrajectorySet(
         mirror,
-        c1,
         clear1,
-        da1,
         n1,
-        da2,
-        n2);
+        da1,
+        n2,
+        no);
   }
 
   /**
@@ -76,12 +76,9 @@ public class Center12 extends AutoBase {
   public void routine() {
     d.simResetWorldPose(t.initalPose());
     s.setReadyToScore(false);
-    r(new ParallelAction(List.of(
-        new TrajectoryAction(t.next(), 2, d),
-        new LambdaAction(() -> {
-          s.setGoal(GoalState.L4);
-        }))));
-    r(new WaitAction(.5));
+    d.setAutoAlignFinishedOverride(true);
+    s.request(s.AutoScoreRequest(GoalState.L4.goal, GoalState.L4.goal.mAlignmentType));
+    r(new WaitAction(2));
     System.out.println("Auto:Starting Score of 3A at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
 
@@ -96,16 +93,28 @@ public class Center12 extends AutoBase {
             new LambdaAction(() -> {
               s.setGoal(GoalState.A1);
             })))));
-    r(new TrajectoryAction(t.next(), 1, d));
+    d.autoAlign(AlignmentType.ALGAE_CLEAN);
+    r(new WaitAction(1));
     System.out.println("Auto:Dealgaefied 6 at " + (Timer.getTimestamp() - startTime));
     scoreNet();
     System.out.println("Auto:Scored first net at " + (Timer.getTimestamp() - startTime));
     s.setGoal(GoalState.A2);
-    r(new TrajectoryAction(t.next(), .5, d));
+    r(new TrajectoryAction(t.next(), d){
+      Timer timer = new Timer();
+      
+      @Override
+      public boolean isFinished() {
+        if(!timer.isRunning())
+          timer.start();
+        return timer.get() > 1;
+      }
+    });
+    d.autoAlign(AlignmentType.ALGAE_CLEAN);
+    r(new WaitAction(2.2));
     System.out.println("Auto:Dealgaefied 5 at " + (Timer.getTimestamp() - startTime));
     scoreNet();
     System.out.println("Auto:Scored second net at " + (Timer.getTimestamp() - startTime));
-
+    r(new TrajectoryAction(t.next(), d));
   }
 
   public void scoreNet() {
@@ -121,7 +130,7 @@ public class Center12 extends AutoBase {
     // r(new WaitForBooleanAction(Elevator.getInstance()::getAtState));
     r(new WaitAction(0.2));
     s.setReadyToScore(true);
-    r(new WaitAction(.3));
+    r(new WaitAction(.4));
     s.setGoal(GoalState.STOW);
 
   }
