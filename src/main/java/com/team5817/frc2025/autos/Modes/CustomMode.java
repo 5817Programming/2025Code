@@ -111,7 +111,6 @@ public class CustomMode extends AutoBase {
    */
   @Override
   public void routine() {
-    s.mElevator.setManualOffset(0.04);
     d.simResetWorldPose(t.initalPose());
     
     nextScore(firstScoreName,false);
@@ -138,7 +137,7 @@ public class CustomMode extends AutoBase {
 
     switch (pickup.state) {
       case GROUND_CORAL_INTAKE:
-        trajectoryAction = new TrackingTrajectoryAction(t.next(), AutoConstants.intakeTimeout,d,g,s);
+        trajectoryAction = new TrajectoryAction(t.next(), AutoConstants.intakeTimeout,d);
         break;
       case HUMAN_CORAL_INTAKE:
         trajectoryAction = new TrajectoryAction(t.next(), AutoConstants.intakeTimeout, d);
@@ -169,7 +168,7 @@ public void nextScore(String scoreName, boolean waitForIndex){
   Pose2d targetPose = new Pose2d(pathPoses);
 
   r(new ParallelAction(List.of(
-      new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance),
+      new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance){},
       new SequentialAction(List.of(
           new WaitAction(waitForIndex? AutoConstants.enterWait : 0),
           new LambdaAction(() -> s.setGoal(GoalState.L4))
@@ -181,7 +180,6 @@ public void nextScore(String scoreName, boolean waitForIndex){
   System.out.println("Auto: Starting Score " + scoreName + " at " + (Timer.getTimestamp() - startTime));
   
   s.setReadyToScore(true);
-  r(new WaitForSuperstructureAction(s));
   r(new WaitAction(AutoConstants.coralSpit));
   
   System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));

@@ -209,9 +209,8 @@ public class Superstructure extends Subsystem {
           mElevator.updateOnBranchDistance(dist);
           mEndEffectorWrist.updateOnBranchDistance(dist);
         } else {
-          double dist = driverAllowsPoseComp ? (-mDrive.getAutoAlignError().x()) : 0;
-          mElevator.updateOnBranchDistance(dist-.03);
-          mEndEffectorWrist.updateOnBranchDistance(dist-.03);
+          mElevator.updateOnBranchDistance(-1);
+          mEndEffectorWrist.updateOnBranchDistance(-1);
         }
       }
 

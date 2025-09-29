@@ -69,8 +69,7 @@ public class AutoAlignMotionPlanner {
 
     boolean translationWithinDeadband = distanceError < poseDeadband.getTranslation().norm();
     boolean rotationWithinDeadband =
-        current_pose.getRotation().distance(mFieldToTargetPoint.getRotation()) < poseDeadband.getRotation().getRadians()
-        && Math.abs(thetaOutput) < 0.02;
+        Math.abs(current_pose.getRotation().distance(mFieldToTargetPoint.getRotation())) < poseDeadband.getRotation().getRadians();
 
     if (mAutoAlignComplete) {
       return ChassisSpeeds.fromFieldRelativeSpeeds(0.0, 0.0, 0.0, current_pose.getRotation());
