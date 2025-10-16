@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.lang.Thread.State;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.team5817.lib.drivers.Subsystem;
@@ -68,7 +70,8 @@ public class RollerSubsystem<S extends Enum<S> & IRollerState> extends Subsystem
         io.runVolts(mState.getDemand());
         break;
     }
-
+    Logger.recordOutput(inputsName + "/State", mState);
+    Logger.recordOutput(inputsName + "/Control Mode", mState);
     Logger.recordOutput(inputsName + "/BrakeModeEnabled", brakeModeEnabled);
   }
 

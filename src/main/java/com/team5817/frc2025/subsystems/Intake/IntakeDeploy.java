@@ -32,9 +32,9 @@ public class IntakeDeploy extends StateBasedServoMotorSubsystem<IntakeDeploy.Sta
    * Represents the different states of the intake deployment.
    */
   public enum State implements ServoState {
-    GROUND(-141, kStrictError),
-    STOW(0, kMediumError),
-    HUMAN(-141, kStrictError),
+    GROUND(0, kStrictError),
+    STOW(141, kMediumError),
+    HUMAN(0, kStrictError),
     ZERO(0, kStrictError),
     DISABLE();
 

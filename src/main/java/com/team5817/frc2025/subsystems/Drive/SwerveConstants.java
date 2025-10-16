@@ -42,7 +42,7 @@ public final class SwerveConstants {
       0.3);
       
   public static final SynchronousPIDF snapPID = new SynchronousPIDF(
-      1.2,
+      1.5,
       0.0,
       0.8,
       1.0);

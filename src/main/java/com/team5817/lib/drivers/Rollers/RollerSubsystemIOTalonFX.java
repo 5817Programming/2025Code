@@ -115,21 +115,19 @@ public class RollerSubsystemIOTalonFX implements RollerSubsystemIO {
             tempCelsius,
             tempFault));
     PhoenixUtil.tryUntilOk(5, () -> mMain.optimizeBusUtilization(0, 1.0));
-
-    // Register signals for refresh
-    PhoenixUtil.registerSignals(
-        new CANBus(id.getBus()).isNetworkFD(),
-        position,
-        velocity,
-        appliedVoltage,
-        supplyCurrent,
-        torqueCurrent,
-        tempCelsius,
-        tempFault);
   }
 
   @Override
   public void updateInputs(RollerSubsystemIOInputs inputs) {
+    BaseStatusSignal.refreshAll(
+      position,
+      velocity,
+      appliedVoltage,
+      supplyCurrent,
+      torqueCurrent,
+      tempCelsius,
+      tempFault);
+      
     inputs.data = new RollerSubsystemIOData(
         Units.rotationsToRadians(position.getValueAsDouble()) / reduction,
         Units.rotationsToRadians(velocity.getValueAsDouble()) / reduction,

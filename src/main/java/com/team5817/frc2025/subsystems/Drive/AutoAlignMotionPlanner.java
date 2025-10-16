@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class AutoAlignMotionPlanner {
 
-  private final PIDController distanceController = new PIDController(19, 0.0, 0.0);
+  private final PIDController distanceController = new PIDController(15, 0.0, 0.0);
   private final SwerveHeadingController mThetaController;
 
   private boolean mAutoAlignComplete = false;
@@ -36,6 +36,7 @@ public class AutoAlignMotionPlanner {
     distanceController.reset();
     mAutoAlignComplete = false;
   }
+  int heartbeat = 0;
 
   public void setTargetPoint(Pose2d targetPoint, Pose2d poseDeadband) {
     mFieldToTargetPoint = targetPoint;
@@ -58,7 +59,7 @@ public class AutoAlignMotionPlanner {
     distanceController.setSetpoint(0.0);
     double driveSpeed = distanceController.calculate(distanceError);
 
-    driveSpeed = Math.copySign(Math.min(Math.abs(driveSpeed), 4), driveSpeed);
+    driveSpeed = Math.copySign(Math.min(Math.abs(driveSpeed), 5), driveSpeed);
 
     Translation2d driveVector = distanceError > 1e-4
         ? translationError.direction().flip().toTranslation().times(driveSpeed)
@@ -75,11 +76,15 @@ public class AutoAlignMotionPlanner {
       return ChassisSpeeds.fromFieldRelativeSpeeds(0.0, 0.0, 0.0, current_pose.getRotation());
     } 
 
-    mAutoAlignComplete = translationWithinDeadband && rotationWithinDeadband;
+    mAutoAlignComplete = translationWithinDeadband && rotationWithinDeadband && Math.abs(driveSpeed)<.1;
 
     Logger.recordOutput("AutoAlign/TranslationDone", translationWithinDeadband);
     Logger.recordOutput("AutoAlign/RotationDone", rotationWithinDeadband);
-
+    Logger.recordOutput("AutoAlign/error", error);
+    Logger.recordOutput("AutoAlign/errornum", distanceError);
+    Logger.recordOutput("AutoAlign/drive speed", driveSpeed);
+    heartbeat++;
+    Logger.recordOutput("AutoAlign/heart", heartbeat);
     if (mStartTime.isPresent() && mAutoAlignComplete) {
       System.out.println("Auto align took: " + (Timer.getFPGATimestamp() - mStartTime.getAsDouble()));
       mStartTime = OptionalDouble.empty();

@@ -110,9 +110,9 @@ public class RobotContainer {
                 mIntake = new Intake(
                                 new RollerSubsystemIOTalonFX(Ports.INTAKE_ROLLER,
                                                 IntakeConstants.RollerConstants.motorConstants, 1),
-                                new RollerSubsystemIOTalonFX(Ports.SIDE_INDEXER,
-                                                IntakeConstants.RollerConstants.motorConstants, 1),
                                 new RollerSubsystemIOTalonFX(Ports.BOTTOM_INDEXER,
+                                                IntakeConstants.RollerConstants.motorConstants, 1),
+                                new RollerSubsystemIOTalonFX(Ports.SIDE_INDEXER,
                                                 IntakeConstants.RollerConstants.motorConstants, 1),
                                 new ServoMotorIOTalonFX(IntakeConstants.DeployConstants.kDeployServoConstants));
 
