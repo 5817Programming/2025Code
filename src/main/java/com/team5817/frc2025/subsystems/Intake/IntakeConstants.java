@@ -88,7 +88,7 @@ public class IntakeConstants {
 
     public enum SideIndexerState implements IRollerState {
       IDLE(0),
-      INTAKING(-6),
+      INTAKING(-8),
       EXHAUST(6),
       SLOW_EXAUST(2);
 
