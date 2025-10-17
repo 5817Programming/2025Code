@@ -75,6 +75,7 @@ public class Intake extends Subsystem {
   public void outputTelemetry() {
     mIntakeDeploy.outputTelemetry();
     mIntakeRollers.outputTelemetry();
+    Logger.recordOutput("Intake/Main State", mState);
   }
 
   public void conformToState(State state) {

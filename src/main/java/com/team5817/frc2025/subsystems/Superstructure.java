@@ -344,7 +344,7 @@ public class Superstructure extends Subsystem {
       return new ParallelRequest();
     }
     return new SequentialRequest(
-        mIntake.stateRequest(Intake.State.HALF_INTAKING), // idle indexer
+        mIntake.stateRequest(Intake.State.INTAKING), // idle indexer
         new ParallelRequest(
             mEndEffectorWrist.stateRequest(goal.mEndEffectorWristState),
             mElevator.stateRequest(goal.mElevatorState),

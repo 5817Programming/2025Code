@@ -63,12 +63,15 @@ public class DriverControls {
    * This mode is used when both driver and co-driver controllers are available.
    */
   public void twoControllerMode() {
-    if (driver.getStartButton())
-      d.zeroGyro(Util.isRed().get() ? 0 : 180);
+    if (driver.getStartButton()){
+      boolean boll  = Util.isRed().get();
+      Logger.recordOutput("Bool", boll);
+      d.zeroGyro(boll ? 0 : 180);
+    }
 
     // if(driver.\)sswaaaaaa
     if (driver.leftBumper.isBeingPressed()) {
-      s.setGoal(GoalState.GROUND_CORAL_INTAKE);
+      s.setGoal(GoalState.EXHAUST);
     }
     if (driver.leftTrigger.isBeingPressed()) {
       s.setGoal(preparedGoal);
@@ -134,7 +137,7 @@ public class DriverControls {
     if (driver.rightTrigger.isBeingPressed() || driver.leftTrigger.isBeingPressed())
       s.setReadyToScore(driver.rightBumper.isBeingPressed());
     else if (driver.rightBumper.isBeingPressed())
-      s.setGoal(GoalState.EXHAUST);
+      s.setGoal(GoalState.GROUND_CORAL_INTAKE);
 
     if (codriver.getRightTriggerAxis() == 1)
       s.mIntake.stateRequest(Intake.State.STOW).act();

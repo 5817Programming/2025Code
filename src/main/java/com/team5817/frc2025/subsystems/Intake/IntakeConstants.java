@@ -72,8 +72,8 @@ public class IntakeConstants {
 
     public enum FeederState implements IRollerState {
       IDLE(0),
-      INTAKING(-10),
-      EXHAUST(6);
+      INTAKING(10),
+      EXHAUST(-6);
 
       @Getter
       private final double demand;
@@ -88,9 +88,9 @@ public class IntakeConstants {
 
     public enum SideIndexerState implements IRollerState {
       IDLE(0),
-      INTAKING(8),
-      EXHAUST(-6),
-      SLOW_EXAUST(-2);
+      INTAKING(-6),
+      EXHAUST(6),
+      SLOW_EXAUST(2);
 
       @Getter
       private final double demand;
@@ -105,9 +105,9 @@ public class IntakeConstants {
 
     public enum LowIndexerState implements IRollerState {
       IDLE(0),
-      INTAKING(2.5),
-      EXHAUST(-6),
-      SLOW_EXAUST(-2);
+      INTAKING(-2),
+      EXHAUST(6),
+      SLOW_EXAUST(2);
 
       @Getter
       private final double demand;
