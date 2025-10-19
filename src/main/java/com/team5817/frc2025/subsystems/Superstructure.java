@@ -198,7 +198,6 @@ public class Superstructure extends Subsystem {
 
       @Override
       public void start() {
-        clearRequestQueue();
       }
 
       @Override

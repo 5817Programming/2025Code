@@ -132,8 +132,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    if(neverEnabled)
-      mSubsystemManager.start();
+    mSubsystemManager.start();
     neverEnabled = false;
     Elastic.selectTab("Autonomous");
     mAutoExecuter.start();
@@ -152,8 +151,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void teleopInit() {
-    if(neverEnabled)
-      mSubsystemManager.start();
+    mSubsystemManager.start();
     mRobotContainer.mEndEffectorWrist.setManualOffset(0);
     mRobotContainer.mElevator.setManualOffset(0);
     neverEnabled = false;
