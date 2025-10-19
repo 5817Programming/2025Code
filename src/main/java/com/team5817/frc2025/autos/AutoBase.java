@@ -51,6 +51,7 @@ public abstract class AutoBase {
             throw new Error("Action ran while auto is inactive");
         while (mActive && !action.isFinished()) {
             action.update();
+            periodic();
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
@@ -61,4 +62,6 @@ public abstract class AutoBase {
         if (!mActive)
             throw new Error("Action Interrupted");
     }
+
+    public void periodic() {}
 }

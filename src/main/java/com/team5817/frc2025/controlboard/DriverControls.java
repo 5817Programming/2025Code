@@ -46,7 +46,7 @@ public class DriverControls {
   public void oneControllerMode() {
     // mDrive.overrideHeading(true);
     if (driver.getStartButton())
-      d.zeroGyro();
+      d.allianceZeroGyro();
   }
 
   CustomXboxController driver;
@@ -64,9 +64,7 @@ public class DriverControls {
    */
   public void twoControllerMode() {
     if (driver.getStartButton()){
-      boolean boll  = Util.isRed().get();
-      Logger.recordOutput("Bool", boll);
-      d.zeroGyro(boll ? 0 : 180);
+      d.allianceZeroGyro();
     }
 
     // if(driver.\)sswaaaaaa

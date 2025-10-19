@@ -88,8 +88,8 @@ public class TunerConstants {
   private static final Distance kWheelRadius = Inches.of(2.0);
 
   // Inversion settings for drivetrain sides
-  private static final boolean kInvertLeftSide = false;//TODO flip these back if the robot drives wrong
-  private static final boolean kInvertRightSide = true;//TODO flip these back if the robot drives wrong
+  private static final boolean kInvertLeftSide = false;
+  private static final boolean kInvertRightSide = true;
 
   // CAN ID for the Pigeon 2
   private static final int kPigeonId = 23;
@@ -141,21 +141,21 @@ public class TunerConstants {
   // === Module constants ===
   public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
       ConstantCreator.createModuleConstants(
-          5, 1, 1, Rotations.of(-0.250244140625+0.5),//TODO find out if the +0.5 and invert drive motor fixes the rotation direction
+          5, 1, 1, Rotations.of(-0.250244140625+0.5),
           kX, kY, kInvertLeftSide, false, false);
 
   public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontRight =
       ConstantCreator.createModuleConstants(
-          6, 2, 2, Rotations.of(0.338623046875+0.5),//TODO find out if the +0.5 and invert drive motor fixes the rotation direction
+          6, 2, 2, Rotations.of(0.338623046875+0.5),
           kX, kY.negate(), kInvertRightSide, false, false);
 
   public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> BackLeft =
       ConstantCreator.createModuleConstants(
-          7, 3, 3, Rotations.of(0-0.349609375+0.5),//TODO find out if the +0.5 and invert drive motor fixes the rotation direction
+          7, 3, 3, Rotations.of(0-0.349609375+0.5),
           kX.negate(), kY, kInvertLeftSide, false, false);
 
   public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> BackRight =
       ConstantCreator.createModuleConstants(
-          8, 4, 4, Rotations.of(0.281005859375+0.5),//TODO find out if the +0.5 and invert drive motor fixes the rotation direction
+          8, 4, 4, Rotations.of(0.281005859375+0.5),
           kX.negate(), kY.negate(), kInvertRightSide, false, false);
 }

@@ -28,6 +28,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.Queue;
 
+import org.littletonrobotics.junction.Logger;
+
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon = new Pigeon2(
@@ -65,6 +67,6 @@ public class GyroIOPigeon2 implements GyroIO {
 
   @Override
   public void resetYaw(Rotation2d newYaw) {
-    PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(newYaw.getDegrees(), 0.25));
+    Logger.recordOutput("GyroResetCode", PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(newYaw.getDegrees(), 0.25)));
   }
 }

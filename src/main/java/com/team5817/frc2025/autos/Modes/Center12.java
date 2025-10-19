@@ -68,7 +68,12 @@ public class Center12 extends AutoBase {
         n2,
         no);
   }
-
+  @Override
+  public void periodic() {
+    double dist = -d.getAutoAlignError().x();
+    s.mElevator.updateOnBranchDistance(dist-.03);
+    s.mEndEffectorWrist.updateOnBranchDistance(dist-.03);
+  }
   /**
    * Executes the autonomous routine for scoring three corals.
    */
@@ -132,6 +137,5 @@ public class Center12 extends AutoBase {
     s.setReadyToScore(true);
     r(new WaitAction(.4));
     s.setGoal(GoalState.STOW);
-
   }
 }

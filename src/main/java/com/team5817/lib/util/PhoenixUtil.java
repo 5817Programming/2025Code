@@ -20,11 +20,13 @@ import org.ironmaple.simulation.SimulatedArena;
 
 public class PhoenixUtil {
   /** Attempts to run the command until no error is produced. */
-  public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
+  public static StatusCode tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
+    StatusCode error = null;
     for (int i = 0; i < maxAttempts; i++) {
-      var error = command.get();
+      error = command.get();
       if (error.isOK()) break;
     }
+    return error;
   }
 
   /** Signals for synchronized refresh. */

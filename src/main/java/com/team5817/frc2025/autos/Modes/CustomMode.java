@@ -105,12 +105,16 @@ public class CustomMode extends AutoBase {
         thirdScoreTrajectory,
         thirdPickupTrajectory);
   }
-
+@Override
+public void periodic() {
+    s.mElevator.updateOnBranchDistance(-1);
+    s.mEndEffectorWrist.updateOnBranchDistance(-1);
+}
   /**
    * Executes the autonomous routine for scoring three corals.
    */
   @Override
-  public void routine() {
+public void routine() {
     d.simResetWorldPose(t.initalPose());
     
     nextScore(firstScoreName,false);

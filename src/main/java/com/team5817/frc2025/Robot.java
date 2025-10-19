@@ -117,7 +117,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     if (needsZero && DriverStation.getAlliance().isPresent()) {
-      mDrive.zeroGyro(Util.isRed().get() ? 0 : 180);
+      mDrive.allianceZeroGyro();
       needsZero = false;
     }
     Logger.recordOutput("Elastic/Match Time", Timer.getMatchTime());

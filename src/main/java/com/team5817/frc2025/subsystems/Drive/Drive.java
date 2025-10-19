@@ -14,6 +14,8 @@
 package com.team5817.frc2025.subsystems.Drive;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,6 +35,7 @@ import com.team5817.frc2025.field.AlignmentPoint.AlignmentType;
 import com.team5817.frc2025.generated.TunerConstants;
 import com.team5817.lib.RobotMode;
 import com.team5817.lib.RobotMode.Mode;
+import com.team5817.lib.Util;
 import com.team5817.lib.drivers.Subsystem;
 import com.team5817.lib.motion.Trajectory;
 import com.team5817.lib.swerve.DriveMotionPlanner;
@@ -56,6 +59,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import lombok.Getter;
@@ -567,8 +571,13 @@ public class Drive extends Subsystem {
     gyroIO.resetYaw(Rotation2d.fromDegrees(newHeading));
   }
 
-  public void zeroGyro() {
-    zeroGyro(0);
+  public void allianceZeroGyro() {
+    Boolean isRed = null;
+    for(int i =0; i<5 && !isRed.equals(null); i++){
+      isRed = Util.isRed().get();
+    }
+    Logger.recordOutput("Drive/Alliance", isRed ? "Red" : "Blue");
+    zeroGyro(isRed ? 0 : 180);
   }
 
   /** Resets the current odometry pose. */
