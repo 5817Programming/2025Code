@@ -23,6 +23,7 @@ import com.team5817.frc2025.autos.TrajectoryLibrary.l;
 import com.team5817.frc2025.controlboard.ControlBoard;
 import com.team5817.frc2025.controlboard.DriverControls;
 import com.team5817.frc2025.subsystems.Drive.Drive;
+import com.team5817.frc2025.subsystems.Vision.Vision;
 import com.team5817.lib.Elastic;
 import com.team5817.lib.Util;
 import com.team5817.lib.vision.LimelightPoseCalibrator;

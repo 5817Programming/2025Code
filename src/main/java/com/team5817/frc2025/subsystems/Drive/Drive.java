@@ -572,10 +572,7 @@ public class Drive extends Subsystem {
   }
 
   public void allianceZeroGyro() {
-    Boolean isRed = null;
-    for(int i =0; i<5 && !isRed.equals(null); i++){
-      isRed = Util.isRed().get();
-    }
+    Boolean isRed = Util.isRed().get();
     Logger.recordOutput("Drive/Alliance", isRed ? "Red" : "Blue");
     zeroGyro(isRed ? 0 : 180);
   }

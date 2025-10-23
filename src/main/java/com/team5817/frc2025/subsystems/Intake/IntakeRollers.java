@@ -36,7 +36,7 @@ public class IntakeRollers extends Subsystem {
     IDLE(FeederState.IDLE, LowIndexerState.IDLE, SideIndexerState.IDLE),
     INTAKING(FeederState.INTAKING, LowIndexerState.INTAKING, SideIndexerState.INTAKING),
     HALF_INTAKING(FeederState.INTAKING, LowIndexerState.IDLE, SideIndexerState.IDLE),
-    EXHAUST(FeederState.EXHAUST, LowIndexerState.IDLE, SideIndexerState.IDLE),
+    EXHAUST(FeederState.EXHAUST, LowIndexerState.EXHAUST, SideIndexerState.EXHAUST),
     IDLE_EXAUST(FeederState.IDLE, LowIndexerState.SLOW_EXAUST, SideIndexerState.SLOW_EXAUST);
 
     @Getter
