@@ -2,6 +2,7 @@ package com.team5817.frc2025.autos.Modes;
 
 import java.util.List;
 
+import com.ctre.phoenix6.wpiutils.ReplayAutoEnable;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.team254.lib.geometry.Pose2d;
 import com.team5817.frc2025.autos.AutoBase;
@@ -30,6 +31,7 @@ import com.team5817.frc2025.autos.Actions.Action;
 import com.team5817.frc2025.autos.Actions.AutoAlignAction;
 import com.team5817.frc2025.autos.Actions.EmptyAction;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -172,7 +174,21 @@ public void nextScore(String scoreName, boolean waitForIndex){
   Pose2d targetPose = new Pose2d(pathPoses);
 
   r(new ParallelAction(List.of(
-      new AutoAlignAction(d, targetPose, AlignmentType.CORAL_SCORE.tolerance){},
+      new AutoAlignAction(d, targetPose, new Pose2d(.0, 0.00, 3)){
+        Pose2d lastPose;
+        double lastTime = 0;
+        @Override
+        public boolean isFinished() {
+          double currentTime = Timer.getTimestamp();
+          Pose2d currentPose = d.getPose();
+          if(lastPose!=null){
+              return currentPose.distance(targetPose)/(currentTime-lastTime)<.01&&currentPose.distance(targetPose)<.04;
+          }
+            lastPose = currentPose;
+            lastTime = currentTime;
+            return false;
+        };
+      },
       new SequentialAction(List.of(
           new WaitAction(waitForIndex? AutoConstants.enterWait : 0),
           new LambdaAction(() -> s.setGoal(GoalState.L4))
@@ -187,6 +203,6 @@ public void nextScore(String scoreName, boolean waitForIndex){
   r(new WaitAction(AutoConstants.coralSpit));
   
   System.out.println("Auto: Scored " + scoreName + " at " + (Timer.getTimestamp() - startTime));
-  s.setReadyToScore(true);
+  s.setReadyToScore(false);
 }
 }
