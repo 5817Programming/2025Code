@@ -92,7 +92,7 @@ public class Superstructure extends Subsystem {
         SuperstructureState.Type.NET)),
     PROCESS(new SuperstructureState(Elevator.State.PROCESS, EndEffectorWrist.State.STOW,
         EndEffectorConstants.RollerState.ALGAE_OUTTAKE, Intake.State.IDLE,
-        SuperstructureState.Type.SCORING, AlignmentType.NONE)),
+        SuperstructureState.Type.NET, AlignmentType.NONE)),
     A1(new SuperstructureState(Elevator.State.A1, EndEffectorWrist.State.A1,
         EndEffectorConstants.RollerState.ALGAE_INTAKE, Intake.State.IDLE,
         SuperstructureState.Type.CLEAN, AlignmentType.ALGAE_CLEAN)),
@@ -363,7 +363,7 @@ public class Superstructure extends Subsystem {
             mIntake.stateRequest(goal.mIntakeState),
             mEndEffectorRollers.stateRequest(EndEffectorConstants.RollerState.HOLDCORAL),
             new SequentialRequest(
-                mElevator.waitToBeOverRequest(ElevatorConstants.kCoralClearHeightRanThroughFinger),
+                mElevator.waitToBeOverRequest(ElevatorConstants.kCoralClearHeight),
                 mEndEffectorWrist.stateRequest(goal.mEndEffectorWristState))),
         new SequentialRequest(
             ReadyToScoreRequest(),

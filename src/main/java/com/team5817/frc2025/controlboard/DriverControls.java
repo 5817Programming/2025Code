@@ -91,7 +91,7 @@ public class DriverControls {
       d.autoAlign(AlignmentType.ALGAE_CLEAN);
       s.setGoal(s.smartAlgaeCleanRequest());
     }
-    Logger.recordOutput("sideTe", s.smartAlgaeCleanRequest());
+    
 
     if (driver.bButton.isBeingPressed())
       s.mEndEffectorRollers.setState(EndEffectorConstants.RollerState.CORAL_INTAKE);

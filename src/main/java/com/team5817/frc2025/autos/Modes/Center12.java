@@ -83,7 +83,7 @@ public class Center12 extends AutoBase {
     s.setReadyToScore(false);
     d.setAutoAlignFinishedOverride(true);
     s.request(s.AutoScoreRequest(GoalState.L4.goal, GoalState.L4.goal.mAlignmentType));
-    r(new WaitAction(2.2));
+    r(new WaitAction(2.25));
     System.out.println("Auto:Starting Score of 3A at " + (Timer.getTimestamp() - startTime));
     s.setReadyToScore(true);
 

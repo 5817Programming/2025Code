@@ -80,7 +80,7 @@ public class AutoAlignMotionPlanner {
 
     Logger.recordOutput("AutoAlign/TranslationDone", translationWithinDeadband);
     Logger.recordOutput("AutoAlign/RotationDone", rotationWithinDeadband);
-    Logger.recordOutput("AutoAlign/error", error);
+    Logger.recordOutput("AutoAlign/error", error.wpi());
     Logger.recordOutput("AutoAlign/errornum", distanceError);
     Logger.recordOutput("AutoAlign/drive speed", driveSpeed);
     heartbeat++;
