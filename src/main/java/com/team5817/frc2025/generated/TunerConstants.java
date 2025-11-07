@@ -69,7 +69,7 @@ public class TunerConstants {
   // CAN bus that the swerve devices are located on;
   // All swerve modules must share the same CAN bus
   public static final CANBus kCANBus = new CANBus("canivore1");
-  public static final CANBus Pigeon2Bus = new CANBus("rio");
+  public static final CANBus Pigeon2Bus = new CANBus("canivore1");
 
   // === Drivetrain-wide co
   // Theoretical free speed (m/s) at 12 V applied output;
