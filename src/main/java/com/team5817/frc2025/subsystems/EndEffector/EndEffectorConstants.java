@@ -58,10 +58,10 @@ public class EndEffectorConstants {
       kWristServoConstants.kName = "EndEffectorWrist";
 
       kWristServoConstants.kMainConstants.id = Ports.ENDEFFECTOR_WRIST;
-      kWristServoConstants.kMainConstants.counterClockwisePositive = false;
+      kWristServoConstants.kMainConstants.counterClockwisePositive = true;
 
       kWristServoConstants.kHomePosition = -89; // degrees
-      kWristServoConstants.kRotationsPerUnitDistance = (1 / 360.0) * 10;
+      kWristServoConstants.kRotationsPerUnitDistance = (1 / 360.0) * 22;
 
       kWristServoConstants.kMaxUnitsLimit = 200-89;
       kWristServoConstants.kMinUnitsLimit = -89;

@@ -43,7 +43,7 @@ public class Ports {
 
 	public static final CanDeviceId INTAKE_CANCODER = new CanDeviceId(19);
 
-	public static final CanDeviceId PIGEON = new CanDeviceId(23);
+	public static final CanDeviceId PIGEON = new CanDeviceId(23,"canivore1");
 
 	public static final CanDeviceId LEDS = new CanDeviceId(21, "rio");
 	public static final CanDeviceId ELEVATOR_2 = new CanDeviceId(22);
