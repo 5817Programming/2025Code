@@ -115,7 +115,7 @@ public class Center12 extends AutoBase {
       }
     });
     d.autoAlign(AlignmentType.ALGAE_CLEAN);
-    r(new WaitAction(2.2));
+    r(new WaitAction(2.3));
     System.out.println("Auto:Dealgaefied 5 at " + (Timer.getTimestamp() - startTime));
     scoreNet();
     System.out.println("Auto:Scored second net at " + (Timer.getTimestamp() - startTime));

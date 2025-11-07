@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.team254.lib.swerve.ChassisSpeeds;
 import com.team5817.BuildConstants;
 import com.team5817.frc2025.autos.AutoBase;
@@ -63,7 +64,7 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     if (Robot.isReal())
       RobotMode.setMode(RobotMode.Mode.REAL);
-
+    SignalLogger.enableAutoLogging(false);
     DriverStation.silenceJoystickConnectionWarning(true);
     for (int port = 5800; port <= 5809; port++) {
       PortForwarder.add(port, "limelight-right.local", port);

@@ -37,8 +37,8 @@ public class Elevator extends StateBasedServoMotorSubsystem<Elevator.State> {
    */
   public enum State implements ServoState {
     L4(1.8635330123363545 - .03, kStrictError, ElevatorConstants.kHighOffsetMap),
-    L3(1.211806509200769 - .06, kStrictError),
-    L2(.754804 + .04           - 0.01 - .02, kStrictError),
+    L3(1.211806509200769 - .075, kStrictError),
+    L2(0.764804, kStrictError), 
     L1(0.219, kStrictError),
     A1(0.59, kMediumError),
     A2(1, kMediumError),

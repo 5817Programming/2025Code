@@ -80,11 +80,8 @@ public class AutoAlignMotionPlanner {
 
     Logger.recordOutput("AutoAlign/TranslationDone", translationWithinDeadband);
     Logger.recordOutput("AutoAlign/RotationDone", rotationWithinDeadband);
-    Logger.recordOutput("AutoAlign/error", error.wpi());
-    Logger.recordOutput("AutoAlign/errornum", distanceError);
-    Logger.recordOutput("AutoAlign/drive speed", driveSpeed);
     heartbeat++;
-    Logger.recordOutput("AutoAlign/heart", heartbeat);
+    Logger.recordOutput("AutoAlign/heart", heartbeat);    
     if (mStartTime.isPresent() && mAutoAlignComplete) {
       System.out.println("Auto align took: " + (Timer.getFPGATimestamp() - mStartTime.getAsDouble()));
       mStartTime = OptionalDouble.empty();

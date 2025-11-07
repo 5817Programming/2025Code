@@ -370,7 +370,7 @@ public class Drive extends Subsystem {
         break;
 
       default:
-        System.out.println("Unsupported Drive Auto ControlState");
+        // System.out.println("Unsupported Drive Auto ControlState"); TODO at shop add back, its annoying
         break;
     }
   }
