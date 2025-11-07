@@ -96,13 +96,11 @@ public class RobotContainer {
         }
 
         public void makeRealRobot() {
-                // mEndEffectorWrist = new EndEffectorWrist(
-                //                 new ServoMotorIOTalonFX(EndEffectorWristConstants.kWristServoConstants));
+                 mEndEffectorWrist = new EndEffectorWrist(
+                                 new ServoMotorIOTalonFX(EndEffectorWristConstants.kWristServoConstants));
 
-                mEndEffectorWrist = new EndEffectorWrist(
-                                new ServoMotorIOSim(
-                                                EndEffectorConstants.EndEffectorWristConstants.kWristServoConstants));
-                                                
+     
+
                 mEndEffectorRollers = new RollerSubsystem<EndEffectorConstants.RollerState>(
                                 EndEffectorConstants.RollerState.IDLE,
                                 "EndEffectorRollers",

@@ -61,18 +61,18 @@ public class EndEffectorConstants {
       kWristServoConstants.kMainConstants.counterClockwisePositive = true;
 
       kWristServoConstants.kHomePosition = -89; // degrees
-      kWristServoConstants.kRotationsPerUnitDistance = (1 / 360.0) * 22;
+      kWristServoConstants.kRotationsPerUnitDistance = (1 / 360.0) * 20.9524/1;
 
       kWristServoConstants.kMaxUnitsLimit = 200-89;
       kWristServoConstants.kMinUnitsLimit = -89;
 
-      kWristServoConstants.kKp = 100;
+      kWristServoConstants.kKp = 1.2;
       kWristServoConstants.kKi = 0;
-      kWristServoConstants.kKd = 0.1;
+      kWristServoConstants.kKd = 0.;
       kWristServoConstants.kKa = 0.0;
-      kWristServoConstants.kKs = 0.04;
+      kWristServoConstants.kKs = 0.0;
       kWristServoConstants.kKv = 0;
-      kWristServoConstants.kKg = 3;
+      kWristServoConstants.kKg = 0;
       kWristServoConstants.kGravityType = GravityTypeValue.Arm_Cosine;
 
       kWristServoConstants.kCruiseVelocity = 160000; // degrees / s
@@ -85,7 +85,7 @@ public class EndEffectorConstants {
       kWristServoConstants.kSupplyCurrentLimit = 40; // amps
 
       kWristServoConstants.kEnableStatorCurrentLimit = true;
-      kWristServoConstants.kStatorCurrentLimit = 30; // amps
+      kWristServoConstants.kStatorCurrentLimit = 10; // amps
 
       kWristServoConstants.kNeutralMode = NeutralModeValue.Brake;
 

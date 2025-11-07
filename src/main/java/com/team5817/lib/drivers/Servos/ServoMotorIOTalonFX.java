@@ -2,6 +2,8 @@ package com.team5817.lib.drivers.Servos;
 
 import java.util.function.UnaryOperator;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -251,7 +253,7 @@ public class ServoMotorIOTalonFX implements ServoMotorIO {
    */
   @Override
   public void forceZeroSensors() {
-    Phoenix6Util.checkErrorAndRetry(() -> mMain.setPosition(0, mConstants.kCANTimeout));
+    Logger.recordOutput(mConstants.kName+" Status Cosde", mMain.setPosition(0));
   }
 
   @Override
